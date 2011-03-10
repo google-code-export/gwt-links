@@ -3,6 +3,7 @@ package com.orange.links.client;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
+import com.orange.links.client.canvas.DiagramCanvas;
 
 public class FunctionShape implements Shape{
 
@@ -44,6 +45,11 @@ public class FunctionShape implements Shape{
 
 	public int getHeight() {
 		return widget.getOffsetHeight();
+	}
+
+	@Override
+	public void drawIfNecessary(DiagramCanvas canvas) {
+		// Nothing to do
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.orange.links.client;
 
+import com.orange.links.client.canvas.DiagramCanvas;
+
 
 public class MouseShape implements Shape {
 
@@ -42,6 +44,11 @@ public class MouseShape implements Shape {
 
 	public void setTop(int top) {
 		this.top = top;
+	}
+
+	@Override
+	public void drawIfNecessary(DiagramCanvas canvas) {
+		// nothing to do
 	}
 
 }

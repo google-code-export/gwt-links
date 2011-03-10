@@ -1,0 +1,9 @@
+.connection-popup{
+  background-color: #cccccc;
+  border: 1px solid #eeeeee;
+}
+
+.connection-popup-item {
+  font-weight: normal;
+  font-size: 80%;
+}
