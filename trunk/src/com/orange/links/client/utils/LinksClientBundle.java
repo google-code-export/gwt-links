@@ -8,12 +8,17 @@ public interface LinksClientBundle extends ClientBundle{
 
 	interface LinksCssResource extends CssResource {
 		
-		@ClassName("connection-popup")
+		@ClassName("links-connection-popup")
 		public String connectionPopup();
 		
-		@ClassName("connection-popup-item")
+		@ClassName("links-connection-popup-item")
 		public String connectionPopupItem();
 		
+		@ClassName("links-highlight-widget")
+		public String highlightWidget();
+		
+		@ClassName("links-translucide")
+		public String translucide();
 	}
 	
 	static final LinksClientBundle INSTANCE = GWT.create(LinksClientBundle.class);

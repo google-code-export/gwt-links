@@ -15,10 +15,8 @@ public interface Connection {
 	Shape getEndShape();
 	
 	// Highlight Point
-	void setHighlightPoint(Point p);
-	Point getHighlightPoint();
-	Point findHighlightPoint(Point p);
-	boolean isPointNearConnection(Point p);
+	void highlightMovablePoint(Point mousePoint);
+	boolean isMouseNearConnection(Point mousePoint);
 
 	// Selection Management
 	boolean isSelected();

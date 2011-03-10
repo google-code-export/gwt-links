@@ -1,29 +1,28 @@
 package com.orange.links.client;
 
 import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.utils.Point;
 
 
 public class MouseShape implements Shape {
 
-	private int left = 0;
-	private int top = 0;
-	private int height = 3;
-	private int width = 3;
+	private Point mousePoint;
+	private int height = 1;
+	private int width = 1;
 	
-	public MouseShape(int left, int top){
-		this.left = left;
-		this.top = top;
+	public MouseShape(Point mousePoint){
+		this.mousePoint = mousePoint;
 	}
 	
 	
 	@Override
 	public int getLeft() {
-		return left;
+		return mousePoint.getLeft();
 	}
 
 	@Override
 	public int getTop() {
-		return top;
+		return mousePoint.getTop();
 	}
 
 	@Override
@@ -34,16 +33,6 @@ public class MouseShape implements Shape {
 	@Override
 	public int getHeight() {
 		return height;
-	}
-
-
-	public void setLeft(int left) {
-		this.left = left;
-	}
-
-
-	public void setTop(int top) {
-		this.top = top;
 	}
 
 	@Override

@@ -62,9 +62,6 @@ public abstract class AbstractConnection {
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 
 	public void draw(){
-		if(highlightPoint != null)
-			highlightPoint(highlightPoint);
-
 		// Reset the segments
 		segmentSet = new HashSet<Segment>();
 
@@ -94,7 +91,7 @@ public abstract class AbstractConnection {
 		}
 	}
 
-	public Point findHighlightPoint(Point p){
+	private Point findHighlightPoint(Point p){
 		for(Segment s : segmentSet){
 			if(ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
 				Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
@@ -106,15 +103,19 @@ public abstract class AbstractConnection {
 		return null;
 	}
 
-	public void highlightPoint(Point p) {
-		DiagramCanvas canvas = controller.getDiagramCanvas();
-		canvas.beginPath();
-		canvas.arc(p.getLeft(), p.getTop(), 5, 0, Math.PI*2, false);
-		canvas.setStrokeStyle(highlightPointColor);
-		canvas.stroke();
-		canvas.setFillStyle(highlightPointColor);
-		canvas.fill();
-		canvas.closePath();
+	public void highlightMovablePoint(Point p) {
+		Point hPoint = findHighlightPoint(p);
+		if(hPoint != null){
+			DiagramCanvas canvas = controller.getDiagramCanvas();
+			canvas.beginPath();
+			canvas.arc(hPoint.getLeft(), hPoint.getTop(), 5, 0, Math.PI*2, false);
+			canvas.setStrokeStyle(highlightPointColor);
+			canvas.stroke();
+			canvas.setFillStyle(highlightPointColor);
+			canvas.fill();
+			canvas.closePath();
+		}
+		setHighlightPoint(hPoint);
 	}
 	
 	public void setStraight(){
@@ -142,7 +143,7 @@ public abstract class AbstractConnection {
 		}
 	}
 	
-	public boolean isPointNearConnection(Point p){
+	public boolean isMouseNearConnection(Point p){
 		for(Segment s : segmentSet){
 			if(ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
 				return true;

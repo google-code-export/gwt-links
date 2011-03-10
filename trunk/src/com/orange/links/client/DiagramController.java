@@ -26,6 +26,7 @@ import com.orange.links.client.connection.StraightArrowConnection;
 import com.orange.links.client.connection.StraightConnection;
 import com.orange.links.client.utils.LinksClientBundle;
 import com.orange.links.client.utils.Point;
+import com.orange.links.client.utils.Rectangle;
 
 public class DiagramController {
 
@@ -39,13 +40,17 @@ public class DiagramController {
 	private Map<Widget,FunctionShape> shapeMap;
 	private Set<Connection> connectionSet;
 
-	private int mouseX;
-	private int mouseY;
+	private Point mousePoint;
 
 	// Drag Edition status
-	private boolean inDragMovablePoint = false;
+	private boolean inEditionDragMovablePoint = false;
+	private boolean inEditionSelectableShapeToDrawConnection = false;
+
 	private Point highlightPoint;
 	private Connection highlightConnection;
+
+	private Widget startFunctionWidget;
+	private Connection buildConnection;
 
 	// setup timer
 	private final Timer timer = new Timer() {
@@ -55,8 +60,59 @@ public class DiagramController {
 		}
 	};
 
+	public void update(){
+		//Restore canvas
+		canvas.clear();
+
+		// Redraw Connections
+		for(Connection c : connectionSet){
+			c.draw();
+		}
+
+		// Search for selectable area
+		for(Widget w : shapeMap.keySet()){
+			FunctionShape s = shapeMap.get(w);
+			if(s.isMouseNearSelectableArea(mousePoint)){
+				s.highlightSelectableArea(mousePoint);
+				inEditionSelectableShapeToDrawConnection = true;
+				startFunctionWidget = w;
+				RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
+				return;
+			}
+		}
+
+		// Don't go deeper if in edition mode
+		if(inEditionSelectableShapeToDrawConnection){
+			// If mouse over a widget, highlight it
+			Widget w = getWidgetUnderMouse();
+			if(w != null){
+				highlightWidget(w);
+			}
+			clearAnimationsOnCanvas();
+			return;
+		}
+
+		// Test if in Drag Movable Point
+		for(Connection c : connectionSet){
+			if(c.isMouseNearConnection(mousePoint)){
+				c.highlightMovablePoint(mousePoint);
+				inEditionDragMovablePoint = true;
+				RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
+				return;
+			}
+			inEditionDragMovablePoint = false;
+		}
+
+		clearAnimationsOnCanvas();
+	}
+
+	public void clearAnimationsOnCanvas(){
+		RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
+	}
+
 	public DiagramController(final DiagramCanvas canvas){
-		this.canvas = canvas;		
+		this.canvas = canvas;	
+		mousePoint = new Point(0,0);
 		connectionSet = new HashSet<Connection>();
 		shapeMap = new HashMap<Widget,FunctionShape>();
 		LinksClientBundle.INSTANCE.css().ensureInjected();
@@ -122,21 +178,16 @@ public class DiagramController {
 
 			popupMenuBar.setVisible(true);
 			popupPanel.add(popupMenuBar);
-			popupPanel.setPopupPosition(mouseX, mouseY);
+			popupPanel.setPopupPosition(mousePoint.getLeft(), mousePoint.getTop());
 			popupPanel.show();
 		}
 	}
 
 	private void onMouseMove(MouseMoveEvent event){
-		mouseX = event.getRelativeX(canvas.getElement());
-		mouseY = event.getRelativeY(canvas.getElement());
-		if(!inDragMovablePoint){
-			highlightMovablePoint(new Point(mouseX, mouseY));
-		}
-		else{
-			highlightPoint.setLeft(mouseX);
-			highlightPoint.setTop(mouseY);
-		}
+		int mouseX = event.getRelativeX(canvas.getElement());
+		int mouseY = event.getRelativeY(canvas.getElement());
+		mousePoint.setLeft(mouseX);
+		mousePoint.setTop(mouseY);
 	}
 
 	private void onMouseUp(MouseUpEvent event){
@@ -146,65 +197,65 @@ public class DiagramController {
 			onCtrlClick();
 			return;
 		}
-		
+
+		if(inEditionSelectableShapeToDrawConnection){
+			Widget widgetSelected = getWidgetUnderMouse();
+			if(widgetSelected != null){
+				drawStraightArrow(startFunctionWidget, widgetSelected, true);
+			}
+			canvas.setBackground();
+			connectionSet.remove(buildConnection);
+			inEditionSelectableShapeToDrawConnection = false;
+			buildConnection = null;
+			for(Widget w : shapeMap.keySet()){
+				removeHighlightWidget(w);
+			}
+			clearAnimationsOnCanvas();
+		}
+
 		if(highlightPoint != null)
-			inDragMovablePoint = false;
+			inEditionDragMovablePoint = false;
 	}
 
 	private void onMouseDown(MouseDownEvent event){
+		if(inEditionSelectableShapeToDrawConnection){
+			drawBuildArrow(startFunctionWidget, mousePoint);
+		}
+
 		if(highlightPoint != null){
 			highlightConnection.addMovablePoint(highlightPoint);
-			inDragMovablePoint = true;
+			inEditionDragMovablePoint = true;
 		}
 	}
-	
+
 	/*
 	 * CONNECTION MANAGEMENT METHODS
 	 */
-	
+
 	private void deleteConnection(Connection c){
 		connectionSet.remove(c);
 	}
-	
+
 	private void setStraightConnection(Connection c){
 		c.setStraight();
 	}
 
 	private Connection findConnectionNearMouse(){
 		for(Connection c : connectionSet){
-			if(c.isPointNearConnection(new Point(mouseX,mouseY)))
+			if(c.isMouseNearConnection(mousePoint))
 				return c;
 		}
 		return null;
 	}
 
-	private void highlightMovablePoint(Point p){
-		for(Connection c : connectionSet){
-			highlightPoint = c.findHighlightPoint(p) ;
-			if(highlightPoint!= null){
-				// A connection has been found : Set new cursor
-				highlightConnection = c;
-				RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
-				return;
-			}
-		}
-		RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
-		// If no movable has been found, remove movable point
-		for(Connection c : connectionSet){
-			// If a movable point is found, stop this method
-			c.setHighlightPoint(null);
-		}
-		return;
-	}
-
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
 		if(!shapeMap.containsKey(startWidget)){
-			shapeMap.put(startWidget,new FunctionShape(startWidget));
+			shapeMap.put(startWidget,new FunctionShape(this,startWidget));
 		}
 		Shape startShape = shapeMap.get(startWidget);
 		if(!shapeMap.containsKey(endWidget)){
-			shapeMap.put(endWidget,new FunctionShape(endWidget));
+			shapeMap.put(endWidget,new FunctionShape(this,endWidget));
 		}
 		Shape endShape = shapeMap.get(endWidget);
 		// Create Connection and Store it in the controller
@@ -217,11 +268,11 @@ public class DiagramController {
 	public Connection drawStraightConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
 		if(!shapeMap.containsKey(startWidget)){
-			shapeMap.put(startWidget,new FunctionShape(startWidget));
+			shapeMap.put(startWidget,new FunctionShape(this,startWidget));
 		}
 		Shape startShape = shapeMap.get(startWidget);
 		if(!shapeMap.containsKey(endWidget)){
-			shapeMap.put(endWidget,new FunctionShape(endWidget));
+			shapeMap.put(endWidget,new FunctionShape(this,endWidget));
 		}
 		Shape endShape = shapeMap.get(endWidget);
 		// Create Connection and Store it in the controller
@@ -229,14 +280,6 @@ public class DiagramController {
 
 		connectionSet.add(c);
 		return c;
-	}
-
-	public void update(){
-		canvas.clear();
-		// Redraw Connections
-		for(Connection c : connectionSet){
-			c.draw();
-		}
 	}
 
 	public DiagramCanvas getDiagramCanvas(){
@@ -247,11 +290,11 @@ public class DiagramController {
 			boolean selectable) {
 		// Build Shape for the Widgets
 		if(!shapeMap.containsKey(startWidget)){
-			shapeMap.put(startWidget,new FunctionShape(startWidget));
+			shapeMap.put(startWidget,new FunctionShape(this,startWidget));
 		}
 		Shape startShape = shapeMap.get(startWidget);
 		if(!shapeMap.containsKey(endWidget)){
-			shapeMap.put(endWidget,new FunctionShape(endWidget));
+			shapeMap.put(endWidget,new FunctionShape(this,endWidget));
 		}
 		Shape endShape = shapeMap.get(endWidget);
 		// Create Connection and Store it in the controller
@@ -261,51 +304,35 @@ public class DiagramController {
 		return c;
 	}
 
-	public void drawBuildArrow(Widget startFunctionWidget, 
-			int startX, int startY){
+	public void drawBuildArrow(Widget startFunctionWidget, Point mousePoint){
 		canvas.setForeground();
-		Shape startShape = new FunctionShape(startFunctionWidget);
-		final MouseShape endShape = new MouseShape(startX,startY);
+		Shape startShape = new FunctionShape(this,startFunctionWidget);
+		final MouseShape endShape = new MouseShape(mousePoint);
 		final Connection c = new StraightArrowConnection(this, startShape, endShape);
 		connectionSet.add(c);
-
-		canvas.addDomHandler(new MouseMoveHandler() {
-			@Override
-			public void onMouseMove(MouseMoveEvent event) {
-				int left = event.getRelativeX(canvas.getElement());
-				int top = event.getRelativeY(canvas.getElement());
-				endShape.setLeft(left);
-				endShape.setTop(top);
-				Point mousePoint = new Point(left,top);
-				/*Set<FunctionContainer> shapeSet = presenter.getFunctionContainerSet();
-				if(highlightFunction != null){
-					highlightFunction.getFunctionWidget().unselect();
-					highlightFunction = null;
-				}
-				for(FunctionContainer f : shapeSet){
-					Rectangle r = new Rectangle(new FunctionShape(f.getFunctionWidget()));
-					if(r.isInside(mousePoint)){
-						highlightFunction = f;
-						highlightFunction.getFunctionWidget().select();
-					}
-				}*/
-			}
-		}, MouseMoveEvent.getType());
-
-		canvas.addDomHandler(new MouseUpHandler() {
-			@Override
-			public void onMouseUp(MouseUpEvent event) {
-
-				// If a function is highlighted, build a connection
-				/*if(highlightFunction != null){
-					presenter.onCreateConnection(DiagramController.this.startFunctionWidget, 
-							highlightFunction.getFunctionWidget());
-					highlightFunction = null;
-				}*/
-				canvas.setBackground();
-				connectionSet.remove(c);
-			}
-		}, MouseUpEvent.getType());
+		buildConnection = c;
 	}
 
+	/*
+	 * Build arrow utils method
+	 */
+	
+	private Widget getWidgetUnderMouse(){
+		for(Widget w : shapeMap.keySet()){
+			Rectangle r = new Rectangle(shapeMap.get(w));
+			removeHighlightWidget(w);
+			if(r.isInside(mousePoint)){
+				return w;
+			}
+		}
+		return null;
+	}
+	
+	private void highlightWidget(Widget w) {
+		w.addStyleName(LinksClientBundle.INSTANCE.css().translucide());
+	}
+	
+	private void removeHighlightWidget(Widget w){
+		w.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
+	}
 }
