@@ -13,8 +13,8 @@ import com.google.gwt.widgetideas.graphics.client.GWTCanvas;
 
 public class MultiBrowserDiagramCanvas implements DiagramCanvas{
 
-	private int width;
-	private int height;
+	protected int width;
+	protected int height;
 	private GWTCanvas canvas;
 	
 	public MultiBrowserDiagramCanvas(int width, int height){

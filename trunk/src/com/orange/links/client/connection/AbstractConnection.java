@@ -1,10 +1,6 @@
 package com.orange.links.client.connection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -35,8 +31,6 @@ public abstract class AbstractConnection {
 
 	protected Point highlightPoint;
 	protected Segment highlightSegment;
-	protected Map<Point,Integer> movablePointsPosition;
-	protected List<Point> movablePointsList;
 	protected SegmentPath segmentPath;
 
 
@@ -44,14 +38,12 @@ public abstract class AbstractConnection {
 		this.controller = controller;
 		this.startShape = startShape;
 		this.endShape = endShape;
-		this.movablePointsList = new ArrayList<Point>();
-		this.movablePointsPosition = new HashMap<Point, Integer>();
 		this.segmentSet = new HashSet<Segment>();
 		this.canvas = controller.getDiagramCanvas();
 
 		// Build Path
-		Segment s = ConnectionUtils.computeSegment(startShape,endShape);
-		this.segmentPath = new SegmentPath(s.getP1(), s.getP2());
+		this.segmentPath = new SegmentPath(startShape,endShape);
+		highlightSegment = this.segmentPath.asStraightPath();
 	}
 
 	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape, boolean selectable){
@@ -62,33 +54,33 @@ public abstract class AbstractConnection {
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 
 	public void draw(){
+		// Draw movable points
+		for(Point p : segmentPath.getPathWithoutExtremities()){
+			new PointShape(p).drawIfNecessary(canvas);
+		}
+		
 		// Reset the segments
 		segmentSet = new HashSet<Segment>();
 
 		// Draw each segment
-		Shape s1 = startShape;
+		segmentPath.update();
+		Point startPoint = segmentPath.getFirstPoint();
 		for(Point p : segmentPath.getPathWithoutExtremities()){
-			Shape s2 = new PointShape(p);
-			Segment seg = ConnectionUtils.computeSegment(s1,s2);
-			draw(seg.getP1(), seg.getP2(), false);
-			segmentSet.add(seg);
-			s1 = s2;
+			Point endPoint = p;
+			draw(startPoint, endPoint, false);
+			segmentSet.add(new Segment(startPoint,endPoint));
+			startPoint = endPoint;
 		}
 		// Draw last segment
-		Segment seg = ConnectionUtils.computeSegment(s1,endShape);
-		segmentSet.add(seg);
-		draw(seg.getP1(), seg.getP2(),true);
+		Point lastPoint = segmentPath.getLastPoint();
+		segmentSet.add(new Segment(startPoint,lastPoint));
+		draw(startPoint, lastPoint,true);
 	}
 
 	public void addMovablePoint(Point p){
-		if(highlightSegment != null){
-			Point startSegmentPoint = highlightSegment.getP1();
-			Point endSegmentPoint = highlightSegment.getP2();
-			segmentPath.add(p, startSegmentPoint, endSegmentPoint);
-		}
-		else{
-			
-		}
+		Point startSegmentPoint = highlightSegment.getP1();
+		Point endSegmentPoint = highlightSegment.getP2();
+		segmentPath.add(p, startSegmentPoint, endSegmentPoint);
 	}
 
 	private Point findHighlightPoint(Point p){
@@ -103,7 +95,7 @@ public abstract class AbstractConnection {
 		return null;
 	}
 
-	public void highlightMovablePoint(Point p) {
+	public Point highlightMovablePoint(Point p) {
 		Point hPoint = findHighlightPoint(p);
 		if(hPoint != null){
 			DiagramCanvas canvas = controller.getDiagramCanvas();
@@ -116,8 +108,9 @@ public abstract class AbstractConnection {
 			canvas.closePath();
 		}
 		setHighlightPoint(hPoint);
+		return hPoint;
 	}
-	
+
 	public void setStraight(){
 		segmentPath.straightPath();
 	}
@@ -142,7 +135,7 @@ public abstract class AbstractConnection {
 			}
 		}
 	}
-	
+
 	public boolean isMouseNearConnection(Point p){
 		for(Segment s : segmentSet){
 			if(ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){

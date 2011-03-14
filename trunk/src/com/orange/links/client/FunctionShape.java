@@ -79,10 +79,10 @@ public class FunctionShape implements Shape{
 	}
 	public Point getSelectableArea(Point p){
 		// Center of the selectable areas
-		Point centerW = new Point(getLeft()-selectableAreaRadius,getTop()+getHeight()/2);
-		Point centerN = new Point(getLeft()+getWidth()/2,getTop()-selectableAreaRadius);
-		Point centerS = new Point(getLeft()+getWidth()/2,getTop()+getHeight()+selectableAreaRadius);
-		Point centerE = new Point(getLeft()+getWidth()+selectableAreaRadius,getTop()+getHeight()/2);
+		Point centerW = new Point(getLeft(),getTop()+getHeight()/2);
+		Point centerN = new Point(getLeft()+getWidth()/2,getTop());
+		Point centerS = new Point(getLeft()+getWidth()/2,getTop()+getHeight());
+		Point centerE = new Point(getLeft()+getWidth(),getTop()+getHeight()/2);
 		if(p.distance(centerW) <= selectableAreaRadius){
 			return centerW;
 		}
@@ -98,4 +98,7 @@ public class FunctionShape implements Shape{
 		return null;
 	}
 
+	public Widget asWidget(){
+		return widget;
+	}
 }

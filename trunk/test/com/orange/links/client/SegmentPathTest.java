@@ -10,7 +10,7 @@ public class SegmentPathTest extends TestCase{
 	public void testComplete(){
 		Point sPoint = new Point(1,1);
 		Point ePoint = new Point(5,4);
-		SegmentPath segmentPath = new SegmentPath(sPoint, ePoint);
+		SegmentPath segmentPath = new SegmentPath(new PointShape(sPoint),new PointShape(ePoint));
 		
 		// Add point
 		Point p1 = new Point(3,1);

@@ -25,8 +25,12 @@ public class StraightArrowConnection extends AbstractConnection implements Conne
 		canvas.lineTo(p2.getLeft(), p2.getTop());
 		
 		// If it is not the last point, 
-		if(!lastPoint)
+		if(!lastPoint){
+			canvas.setStrokeStyle(connectionColor);
+			canvas.stroke();
+			canvas.closePath();
 			return;
+		}
 
 		double linkAngle = Math.acos((p2.getLeft()-p1.getLeft())/Math.sqrt(Math.pow(p2.getLeft()-p1.getLeft(),2)+Math.pow(p2.getTop()-p1.getTop(),2)));
 		if(p2.getTop()<p1.getTop())
