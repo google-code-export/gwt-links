@@ -3,15 +3,15 @@ package com.orange.links.client.utils;
 
 public class Direction {
 
-    public static final Direction UP = new Direction("UP", 0.0f);
-    public static final Direction DOWN = new Direction("DOWN", 180.0f);
-    public static final Direction LEFT = new Direction("LEFT", 270.0f);
-    public static final Direction RIGHT = new Direction("RIGHT", 90.0f);
+    public static final Direction UP = new Direction("UP", Math.PI/2);
+    public static final Direction DOWN = new Direction("DOWN", 3*Math.PI/2);
+    public static final Direction LEFT = new Direction("LEFT", Math.PI);
+    public static final Direction RIGHT = new Direction("RIGHT", 0);
     
     private final String id;
-    private final float angle;
+    private final double angle;
     
-    private Direction(String id, float angle){
+    private Direction(String id, double angle){
         this.id = id;
         this.angle = angle;
     }
@@ -40,7 +40,7 @@ public class Direction {
     /**
      * @return representing angle value
      */
-    public float getAngle(){
+    public double getAngle(){
     	return angle;
     }
     

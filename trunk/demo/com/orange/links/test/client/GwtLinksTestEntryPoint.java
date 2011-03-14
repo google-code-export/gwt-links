@@ -1,6 +1,8 @@
 package com.orange.links.test.client;
 
 
+import java.util.Date;
+
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -19,6 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;
 import com.orange.links.client.connection.Connection;
+import com.orange.links.client.event.TieLinkEvent;
+import com.orange.links.client.event.TieLinkHandler;
+import com.orange.links.client.event.UntieLinkEvent;
+import com.orange.links.client.event.UntieLinkHandler;
 import com.orange.links.client.utils.Point;
 
 public class GwtLinksTestEntryPoint implements EntryPoint {
@@ -37,7 +43,12 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		MultiBrowserDiagramCanvas canvas = new MultiBrowserDiagramCanvas(tabWidth,tabHeight);
 		controller = new DiagramController(canvas);
 		controller.showGrid(true);
-		globalPanel.add(controller.getView());
+		
+		Widget w = controller.getView();
+		w.getElement().getStyle().setMargin(20, Unit.PX);
+		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
+		
+		globalPanel.add(w);
 		drawExample2();
 		
 		// DEBUG : Panel with informations
@@ -76,11 +87,38 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		infoLabel.getElement().getStyle().setFontWeight(FontWeight.BOLD);
 		infoLabel.getElement().getStyle().setMarginTop(20, Unit.PX);
 		infoPanel.add(infoLabel);
+		
 		infoPanel.add(new Label("Refresh Rate : " + DiagramController.refreshRate + "ms"));
 		infoPanel.add(new HTML("Source Page :  <a href=\"http://goo.gl/bevvN\">http://goo.gl/bevvN</a>"));
 		infoPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		infoPanel.getElement().getStyle().setPadding(10, Unit.PX);
+		infoPanel.getElement().getStyle().setMargin(20, Unit.PX);
 		globalPanel.add(infoPanel);
+		
+		// Scroll Panel to show events
+		final VerticalPanel eventPanel = new VerticalPanel();
+		final long now = new Date().getTime();
+		controller.addTieLinkHandler(new TieLinkHandler() {
+			@Override
+			public void onTieLink(TieLinkEvent event) {
+				Label tieLabel = new Label(new Date().getTime() - now + " | Event received - TieLinkEvent");
+				tieLabel.getElement().getStyle().setColor("green");
+				eventPanel.add(tieLabel);
+			}
+		});
+		controller.addUntieLinkHandler(new UntieLinkHandler() {
+			@Override
+			public void onUntieLink(UntieLinkEvent event) {
+				Label tieLabel = new Label(new Date().getTime() - now + " | Event received - UntieLinkEvent");
+				tieLabel.getElement().getStyle().setColor("red");
+				eventPanel.add(tieLabel);
+			}
+		});
+		eventPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
+		eventPanel.getElement().getStyle().setPadding(10, Unit.PX);
+		eventPanel.getElement().getStyle().setMargin(20, Unit.PX);
+		eventPanel.getElement().getStyle().setWidth(300, Unit.PX);
+		globalPanel.add(eventPanel);
 	}
 	
 	private void clear(){

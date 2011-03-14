@@ -5,12 +5,14 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.utils.Couple;
+import com.orange.links.client.utils.Direction;
 import com.orange.links.client.utils.Point;
 
 public class FunctionShape implements Shape{
 
 	private Widget widget;
-	private int selectableAreaRadius = 5;
+	private int selectableAreaRadius = 7;
 	private DiagramController controller;
 	private CssColor highlightSelectableAreaColor = CssColor.make("#FF6600");
 
@@ -64,12 +66,17 @@ public class FunctionShape implements Shape{
 
 	public void highlightSelectableArea(Point mousePoint){
 		// Mouse Point
-		Point closestSelectablePoint = getSelectableArea(mousePoint);
+		Couple<Direction,Point> couple = getSelectableArea(mousePoint);
+		Direction direction = couple.getFirstArg();
+		Point closestSelectablePoint = couple.getSecondArg();
 		if(closestSelectablePoint != null){
 			DiagramCanvas canvas = controller.getDiagramCanvas();
 			canvas.beginPath();
 			canvas.arc(closestSelectablePoint.getLeft(), 
-					closestSelectablePoint.getTop(), selectableAreaRadius, 0, Math.PI*2, false);
+					closestSelectablePoint.getTop(), selectableAreaRadius,
+					direction.getAngle()-Math.PI/2,
+					direction.getAngle()+Math.PI/2,
+					direction.equals(Direction.UP) || direction.equals(Direction.DOWN));
 			canvas.setStrokeStyle(highlightSelectableAreaColor);
 			canvas.stroke();
 			canvas.setFillStyle(highlightSelectableAreaColor);
@@ -77,23 +84,24 @@ public class FunctionShape implements Shape{
 			canvas.closePath();
 		}
 	}
-	public Point getSelectableArea(Point p){
+	
+	public Couple<Direction,Point> getSelectableArea(Point p){
 		// Center of the selectable areas
 		Point centerW = new Point(getLeft(),getTop()+getHeight()/2);
 		Point centerN = new Point(getLeft()+getWidth()/2,getTop());
-		Point centerS = new Point(getLeft()+getWidth()/2,getTop()+getHeight());
-		Point centerE = new Point(getLeft()+getWidth(),getTop()+getHeight()/2);
+		Point centerS = new Point(getLeft()+getWidth()/2,getTop()+getHeight()-1);
+		Point centerE = new Point(getLeft()+getWidth()-1,getTop()+getHeight()/2);
 		if(p.distance(centerW) <= selectableAreaRadius){
-			return centerW;
+			return new Couple<Direction, Point>(Direction.LEFT, centerW);
 		}
 		else if(p.distance(centerN) <= selectableAreaRadius){
-			return centerN;
+			return new Couple<Direction, Point>(Direction.UP, centerN);
 		}
 		else if(p.distance(centerS) <= selectableAreaRadius){
-			return centerS;
+			return new Couple<Direction, Point>(Direction.DOWN, centerS);
 		}
 		else if(p.distance(centerE) <= selectableAreaRadius){
-			return centerE;
+			return new Couple<Direction, Point>(Direction.RIGHT, centerE);
 		}
 		return null;
 	}

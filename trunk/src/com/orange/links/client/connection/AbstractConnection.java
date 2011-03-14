@@ -1,6 +1,8 @@
 package com.orange.links.client.connection;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -9,6 +11,7 @@ import com.orange.links.client.PointShape;
 import com.orange.links.client.Shape;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.ConnectionUtils;
+import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 import com.orange.links.client.utils.SegmentPath;
@@ -52,6 +55,7 @@ public abstract class AbstractConnection {
 	}
 
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
+	protected abstract void draw(List<Point> pointList);
 
 	public void draw(){
 		// Draw movable points
@@ -64,23 +68,32 @@ public abstract class AbstractConnection {
 
 		// Draw each segment
 		segmentPath.update();
+		List<Point> pointList = new ArrayList<Point>();
 		Point startPoint = segmentPath.getFirstPoint();
+		pointList.add(startPoint);
 		for(Point p : segmentPath.getPathWithoutExtremities()){
 			Point endPoint = p;
 			draw(startPoint, endPoint, false);
+			pointList.add(endPoint);
 			segmentSet.add(new Segment(startPoint,endPoint));
 			startPoint = endPoint;
 		}
 		// Draw last segment
 		Point lastPoint = segmentPath.getLastPoint();
+		pointList.add(lastPoint);
 		segmentSet.add(new Segment(startPoint,lastPoint));
 		draw(startPoint, lastPoint,true);
+		
+		// Draw All the register point
+		// draw(pointList);
 	}
-
-	public void addMovablePoint(Point p){
+	
+	public MovablePoint addMovablePoint(Point p){
 		Point startSegmentPoint = highlightSegment.getP1();
 		Point endSegmentPoint = highlightSegment.getP2();
-		segmentPath.add(p, startSegmentPoint, endSegmentPoint);
+		MovablePoint movablePoint = new MovablePoint(p);
+		segmentPath.add(movablePoint, startSegmentPoint, endSegmentPoint);
+		return movablePoint;
 	}
 
 	private Point findHighlightPoint(Point p){
@@ -138,7 +151,8 @@ public abstract class AbstractConnection {
 
 	public boolean isMouseNearConnection(Point p){
 		for(Segment s : segmentSet){
-			if(ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
+			if( !s.getP1().equals(s.getP2())
+					&& ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
 				return true;
 			}
 		}

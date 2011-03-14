@@ -37,6 +37,7 @@ import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkEvent.HasUntieLinkHandlers;
 import com.orange.links.client.event.UntieLinkHandler;
 import com.orange.links.client.utils.LinksClientBundle;
+import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Rectangle;
 
@@ -62,9 +63,11 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	private boolean inEditionDragMovablePoint = false;
 	private boolean inEditionSelectableShapeToDrawConnection = false;
 	private boolean inDragBuildArrow = false;
+	private boolean inDragMovablePoint = false;
 
 	private Point highlightPoint;
 	private Connection highlightConnection;
+	private MovablePoint movablePoint;
 
 	private Widget startFunctionWidget;
 	private Connection buildConnection;
@@ -243,7 +246,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 			onCtrlClick();
 			return;
 		}
-
+		
+		if(inDragMovablePoint){
+			movablePoint.setFixed(true);
+			inDragMovablePoint = false;
+			return;
+		}
+		
 		if(inEditionSelectableShapeToDrawConnection){
 			Widget widgetSelected = getWidgetUnderMouse();
 			if(widgetSelected != null && startFunctionWidget!= widgetSelected){
@@ -267,13 +276,20 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	}
 
 	private void onMouseDown(MouseDownEvent event){
+		// Test if Ctrl Click
+		if(event.isControlKeyDown()){
+			return;
+		}
+		
 		if(inEditionSelectableShapeToDrawConnection){
 			inDragBuildArrow = true;
 			drawBuildArrow(startFunctionWidget, mousePoint);
 		}
 
 		if(inEditionDragMovablePoint){
-			highlightConnection.addMovablePoint(highlightPoint);
+			inDragMovablePoint = true;
+			movablePoint = highlightConnection.addMovablePoint(highlightPoint);
+			movablePoint.setTrackPoint(mousePoint);
 		}
 	}
 

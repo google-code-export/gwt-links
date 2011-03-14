@@ -2,8 +2,8 @@ package com.orange.links.client.utils;
 
 
 public class Point {
-	public int left;
-	public int top;
+	protected int left;
+	protected int top;
 	private Direction direction;
 	
 	public Point(int left, int top) {

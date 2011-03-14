@@ -15,7 +15,6 @@ public class SegmentPath {
 	public SegmentPath(Shape startShape, Shape endShape){
 		this.startShape = startShape;
 		this.endShape = endShape;
-		
 		straightPath();
 	}
 
