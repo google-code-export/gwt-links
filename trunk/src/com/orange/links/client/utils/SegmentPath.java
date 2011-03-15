@@ -38,6 +38,14 @@ public class SegmentPath {
 		pointList.set(pointList.size()-1, endSegment.getP2());
 	}
 	
+	public Segment getMiddleSegment(){
+		int size = pointList.size();
+		Point p1 = pointList.get(Math.round(size/2-1));
+		Point p2 = pointList.get(Math.round(size/2));
+		Segment s = new Segment(p1, p2);
+		return s;
+	}
+	
 	public Point getFirstPoint(){
 		return pointList.get(0);
 	}

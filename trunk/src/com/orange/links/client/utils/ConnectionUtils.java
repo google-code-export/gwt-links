@@ -97,12 +97,12 @@ public class ConnectionUtils {
 					GWT.log("gwt-debug : The projection has been aborted");
 				}
 				Point middlePoint = middle(tempSegment.getP1(),tempSegment.getP2());
-				p1 = new Point(middlePoint.getLeft(),r1.getCornerBottomRight().getTop());
+				p1 = new Point(middlePoint.getLeft(),r1.getCornerBottomRight().getTop()-1);
 				p2 = new Point(p1.getLeft(),r2.getCornerTopLeft().getTop());
 			}else{
 				Segment tempSegment = project(r2.getBorderTop(), r1.getBorderBottom());
 				Point middlePoint = middle(tempSegment.getP1(),tempSegment.getP2());
-				p2 = new Point(middlePoint.getLeft(),r2.getCornerTopRight().getTop());
+				p2 = new Point(middlePoint.getLeft(),r2.getCornerTopRight().getTop()-1);
 				p1 = new Point(p2.getLeft(),r1.getCornerBottomLeft().getTop());
 			}
 			return new Segment(p1,p2);

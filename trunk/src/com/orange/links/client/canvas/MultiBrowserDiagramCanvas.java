@@ -138,4 +138,9 @@ public class MultiBrowserDiagramCanvas implements DiagramCanvas{
 		canvas.fill();
 	}
 
+	@Override
+	public void bezierCurveTo(double cpx, double cpy, double x, double y) {
+		canvas.cubicCurveTo(cpx, cpy, cpx, cpy, x, y);
+	}
+
 }

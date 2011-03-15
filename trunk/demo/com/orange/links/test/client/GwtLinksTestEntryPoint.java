@@ -10,6 +10,7 @@ import com.google.gwt.dom.client.Style.FontWeight;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -45,13 +46,15 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		controller.showGrid(true);
 		
 		Widget w = controller.getView();
-		w.getElement().getStyle().setMargin(20, Unit.PX);
+		w.getElement().getStyle().setMargin(10, Unit.PX);
 		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		
 		globalPanel.add(w);
 		drawExample2();
 		
 		// DEBUG : Panel with informations
+		VerticalPanel rightPanel = new VerticalPanel();
+		
 		VerticalPanel infoPanel = new VerticalPanel();
 		Label exampleLabel = new Label("EXAMPLES");
 		exampleLabel.getElement().getStyle().setFontWeight(FontWeight.BOLD);
@@ -85,15 +88,31 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		infoPanel.add(example3Anchor);
 		Label infoLabel = new Label("INFORMATIONS");
 		infoLabel.getElement().getStyle().setFontWeight(FontWeight.BOLD);
-		infoLabel.getElement().getStyle().setMarginTop(20, Unit.PX);
 		infoPanel.add(infoLabel);
 		
 		infoPanel.add(new Label("Refresh Rate : " + DiagramController.refreshRate + "ms"));
 		infoPanel.add(new HTML("Source Page :  <a href=\"http://goo.gl/bevvN\">http://goo.gl/bevvN</a>"));
+		infoPanel.add(new HTML("Contextual Menu :  Ctrl+Click on a connection"));
 		infoPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		infoPanel.getElement().getStyle().setPadding(10, Unit.PX);
-		infoPanel.getElement().getStyle().setMargin(20, Unit.PX);
-		globalPanel.add(infoPanel);
+		infoPanel.getElement().getStyle().setMargin(10, Unit.PX);
+		infoPanel.getElement().getStyle().setWidth(300, Unit.PX);
+		rightPanel.add(infoPanel);
+		
+		// Vertical Panel to display edition property
+		final VerticalPanel editionPanel = new VerticalPanel();
+		Timer timer = new Timer() {
+			@Override
+			public void run() {
+				updateEditionPanel(editionPanel);
+			}
+		};
+		timer.scheduleRepeating(25);
+		editionPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
+		editionPanel.getElement().getStyle().setPadding(10, Unit.PX);
+		editionPanel.getElement().getStyle().setMargin(10, Unit.PX);
+		editionPanel.getElement().getStyle().setWidth(300, Unit.PX);
+		rightPanel.add(editionPanel);
 		
 		// Scroll Panel to show events
 		final VerticalPanel eventPanel = new VerticalPanel();
@@ -116,15 +135,67 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		});
 		eventPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		eventPanel.getElement().getStyle().setPadding(10, Unit.PX);
-		eventPanel.getElement().getStyle().setMargin(20, Unit.PX);
+		eventPanel.getElement().getStyle().setMargin(10, Unit.PX);
 		eventPanel.getElement().getStyle().setWidth(300, Unit.PX);
-		globalPanel.add(eventPanel);
+		rightPanel.add(eventPanel);
+		globalPanel.add(rightPanel);
+	}
+	
+	private void updateEditionPanel(VerticalPanel panel){
+		panel.clear();
+		// InDragBuildArrow
+		if(controller.isInDragBuildArrow()){
+			Label dragBuildLabel = new Label("Active : inDragBuildArrow");
+			dragBuildLabel.getElement().getStyle().setColor("green");
+			panel.add(dragBuildLabel);
+		}
+		else{
+			Label dragBuildLabel = new Label("Inactive : inDragBuildArrow");
+			dragBuildLabel.getElement().getStyle().setColor("red");
+			panel.add(dragBuildLabel);
+		}
+		// InDragMovablePoint
+		if(controller.isInDragMovablePoint()){
+			Label dragMovableLabel = new Label("Active : InDragMovablePoint");
+			dragMovableLabel.getElement().getStyle().setColor("green");
+			panel.add(dragMovableLabel);
+		}
+		else{
+			Label dragMovableLabel = new Label("Inactive : InDragMovablePoint");
+			dragMovableLabel.getElement().getStyle().setColor("red");
+			panel.add(dragMovableLabel);
+		}
+		// InEditionDragMovablePoint
+		if(controller.isInEditionDragMovablePoint()){
+			Label dragBuildLabel = new Label("Active : InEditionDragMovablePoint");
+			dragBuildLabel.getElement().getStyle().setColor("green");
+			panel.add(dragBuildLabel);
+		}
+		else{
+			Label dragBuildLabel = new Label("Inactive : InEditionDragMovablePoint");
+			dragBuildLabel.getElement().getStyle().setColor("red");
+			panel.add(dragBuildLabel);
+		}
+		// InEditionSelectableShapeToDrawConnection
+		if(controller.isInEditionSelectableShapeToDrawConnection()){
+			Label dragBuildLabel = new Label("Active : InEditionToDrawConnection");
+			dragBuildLabel.getElement().getStyle().setColor("green");
+			panel.add(dragBuildLabel);
+		}
+		else{
+			Label dragBuildLabel = new Label("Inactive : InEditionToDrawConnection");
+			dragBuildLabel.getElement().getStyle().setColor("red");
+			panel.add(dragBuildLabel);
+		}
 	}
 	
 	private void clear(){
 		globalPanel.remove(controller.getView());
 		MultiBrowserDiagramCanvas canvas = new MultiBrowserDiagramCanvas(tabWidth,tabHeight);
 		controller = new DiagramController(canvas);
+		Widget w = controller.getView();
+		w.getElement().getStyle().setMargin(10, Unit.PX);
+		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		controller.showGrid(true);
 		globalPanel.insert(controller.getView(),0);
 	}
@@ -187,8 +258,14 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		dragController.makeDraggable(img);
 		
 		// Add the logic
-		controller.drawStraightArrowConnection(labelHello, labelWorld);
+		Connection c1 = controller.drawStraightArrowConnection(labelHello, labelWorld);
 		controller.drawStraightConnection(labelHello, img);
+		Label decorationLabel = new Label("Mickey");
+		decorationLabel.getElement().getStyle().setBackgroundColor("#FFFFFF");
+		decorationLabel.getElement().getStyle().setPadding(5, Unit.PX);
+		decorationLabel.getElement().getStyle().setProperty("border", "1px solid black");
+		controller.addDecoration(decorationLabel, c1);
+		
 	}
 	
 	private void drawExample3(){

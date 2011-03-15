@@ -1,6 +1,5 @@
 package com.orange.links.client;
 
-import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.Point;
 
 
@@ -33,11 +32,6 @@ public class MouseShape implements Shape {
 	@Override
 	public int getHeight() {
 		return height;
-	}
-
-	@Override
-	public void drawIfNecessary(DiagramCanvas canvas) {
-		// nothing to do
 	}
 
 }

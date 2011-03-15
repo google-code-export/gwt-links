@@ -43,4 +43,18 @@ public class Segment {
 		p1.translate(left, top);
 		p2.translate(left, top);
 	}
+	
+	public Point middle(){
+		return new Point(
+				(p2.getLeft()+p1.getLeft())/2,
+				(p2.getTop()+p1.getTop())/2
+				);
+	}
+	
+	public double getAngleWithTop(){
+		double linkAngle = Math.acos((p2.getLeft()-p1.getLeft())/Math.sqrt(Math.pow(p2.getLeft()-p1.getLeft(),2)+Math.pow(p2.getTop()-p1.getTop(),2)));
+		if(p2.getTop()<p1.getTop())
+			linkAngle = linkAngle * -1;
+		return linkAngle;
+	}
 }

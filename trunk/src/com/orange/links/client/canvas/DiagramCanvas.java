@@ -6,7 +6,6 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
-import com.orange.links.client.DiagramController;
 
 
 public interface DiagramCanvas {
@@ -41,4 +40,5 @@ public interface DiagramCanvas {
 	void stroke();
 	void arc(double x, double y, double radius,  double startAngle, double endAngle, boolean anticlockwise);
 	void fill();
+	void bezierCurveTo(double cpx, double cpy, double x, double y);
 }

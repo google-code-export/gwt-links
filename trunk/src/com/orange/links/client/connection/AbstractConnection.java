@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.dom.client.Style.Unit;
+import com.orange.links.client.DecorationShape;
 import com.orange.links.client.DiagramController;
-import com.orange.links.client.PointShape;
 import com.orange.links.client.Shape;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.ConnectionUtils;
@@ -23,6 +24,7 @@ public abstract class AbstractConnection {
 	protected Set<Segment> segmentSet;
 	protected DiagramController controller;
 	protected DiagramCanvas canvas;
+	protected DecorationShape decoration;
 
 	protected boolean selectable;
 	protected boolean selected;
@@ -35,7 +37,6 @@ public abstract class AbstractConnection {
 	protected Point highlightPoint;
 	protected Segment highlightSegment;
 	protected SegmentPath segmentPath;
-
 
 	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape){
 		this.controller = controller;
@@ -54,15 +55,11 @@ public abstract class AbstractConnection {
 		this.selectable = selectable;
 	}
 
+
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 	protected abstract void draw(List<Point> pointList);
 
 	public void draw(){
-		// Draw movable points
-		for(Point p : segmentPath.getPathWithoutExtremities()){
-			new PointShape(p).drawIfNecessary(canvas);
-		}
-		
 		// Reset the segments
 		segmentSet = new HashSet<Segment>();
 
@@ -73,7 +70,7 @@ public abstract class AbstractConnection {
 		pointList.add(startPoint);
 		for(Point p : segmentPath.getPathWithoutExtremities()){
 			Point endPoint = p;
-			draw(startPoint, endPoint, false);
+			//draw(startPoint, endPoint, false);
 			pointList.add(endPoint);
 			segmentSet.add(new Segment(startPoint,endPoint));
 			startPoint = endPoint;
@@ -82,12 +79,25 @@ public abstract class AbstractConnection {
 		Point lastPoint = segmentPath.getLastPoint();
 		pointList.add(lastPoint);
 		segmentSet.add(new Segment(startPoint,lastPoint));
-		draw(startPoint, lastPoint,true);
-		
+		//draw(startPoint, lastPoint,true);
+
 		// Draw All the register point
-		// draw(pointList);
+		draw(pointList);
+
+		updateDecoration();
 	}
-	
+
+	private void updateDecoration(){
+		if(decoration != null){
+			Segment decoratedSegment = segmentPath.getMiddleSegment();
+			Point decorationCenter = decoratedSegment.middle();
+			int width = decoration.getWidth();
+			int height = decoration.getHeight();
+			decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop()-height/2, Unit.PX);
+			decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft()-width/2, Unit.PX);
+		}
+	}
+
 	public MovablePoint addMovablePoint(Point p){
 		Point startSegmentPoint = highlightSegment.getP1();
 		Point endSegmentPoint = highlightSegment.getP2();
@@ -124,6 +134,10 @@ public abstract class AbstractConnection {
 		return hPoint;
 	}
 
+	public void removeDecoration(){
+		decoration = null;
+	}
+	
 	public void setStraight(){
 		segmentPath.straightPath();
 	}
@@ -184,5 +198,14 @@ public abstract class AbstractConnection {
 	public void setHighlightPoint(Point highlightPoint) {
 		this.highlightPoint = highlightPoint;
 	}
+
+	public void setDecoration(DecorationShape decoration){
+		this.decoration = decoration;
+	}
+
+	public DecorationShape getDecoration(){
+		return decoration;
+	}
+
 
 }

@@ -1,7 +1,5 @@
 package com.orange.links.client;
 
-import com.orange.links.client.canvas.DiagramCanvas;
-import com.orange.links.client.connection.AbstractConnection;
 import com.orange.links.client.utils.Point;
 
 public class PointShape implements Shape{
@@ -30,15 +28,6 @@ public class PointShape implements Shape{
 	@Override
 	public int getHeight() {
 		return 1;
-	}
-
-	@Override
-	public void drawIfNecessary(DiagramCanvas canvas) {
-		canvas.beginPath();
-		canvas.setFillStyle(AbstractConnection.defaultConnectionColor);
-		canvas.fillRect(getLeft(), getTop(), getWidth(), getHeight());
-		canvas.fill();
-		canvas.closePath();
 	}
 
 }

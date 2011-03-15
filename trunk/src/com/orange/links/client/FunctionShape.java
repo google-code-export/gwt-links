@@ -55,11 +55,6 @@ public class FunctionShape implements Shape{
 		return widget.getOffsetHeight();
 	}
 
-	@Override
-	public void drawIfNecessary(DiagramCanvas canvas) {
-		// Nothing to do
-	}
-
 	public boolean isMouseNearSelectableArea(Point mousePoint){
 		return getSelectableArea(mousePoint) != null;
 	}

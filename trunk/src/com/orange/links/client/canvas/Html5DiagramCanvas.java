@@ -9,7 +9,6 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
-import com.orange.links.client.DiagramController;
 
 public class Html5DiagramCanvas implements DiagramCanvas{
 
@@ -143,6 +142,11 @@ public class Html5DiagramCanvas implements DiagramCanvas{
 	@Override
 	public void fill() {
 		context.fill();
+	}
+
+	@Override
+	public void bezierCurveTo(double cpx, double cpy, double x, double y) {
+		context.bezierCurveTo(cpx, cpy, cpx, cpy, x, y);
 	}
 
 }
