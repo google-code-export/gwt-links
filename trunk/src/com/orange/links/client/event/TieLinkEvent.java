@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.ui.Widget;
+import com.orange.links.client.connection.Connection;
 
 public class TieLinkEvent extends GwtEvent<TieLinkHandler>{
 	
@@ -14,10 +15,13 @@ public class TieLinkEvent extends GwtEvent<TieLinkHandler>{
 	
 	private Widget startWidget;
 	private Widget endWidget;
+	private Connection connection;
 
-	public TieLinkEvent(Widget startWidget, Widget endWidget){
+
+	public TieLinkEvent(Widget startWidget, Widget endWidget, Connection c){
 		this.setStartWidget(startWidget);
 		this.setEndWidget(endWidget);
+		this.setConnection(c);
 	}
 	
 	private static Type<TieLinkHandler> TYPE;
@@ -51,6 +55,15 @@ public class TieLinkEvent extends GwtEvent<TieLinkHandler>{
 
 	public void setEndWidget(Widget endWidget) {
 		this.endWidget = endWidget;
+	}
+	
+
+	public Connection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(Connection connection) {
+		this.connection = connection;
 	}
 
 }

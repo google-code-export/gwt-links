@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
@@ -59,6 +61,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	private Set<Connection> connectionSet;
 
 	private Point mousePoint;
+	private Point mouseOffsetPoint;
 
 	// Drag Edition status
 	private boolean inEditionDragMovablePoint = false;
@@ -84,6 +87,8 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		widgetPanel.add(canvas.asWidget());
 
 		mousePoint = new Point(0,0);
+		mouseOffsetPoint = new Point(0,0);
+		
 		connectionSet = new HashSet<Connection>();
 		shapeMap = new HashMap<Widget,FunctionShape>();
 		handlerManager = new HandlerManager(canvas);
@@ -114,7 +119,16 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}, MouseUpEvent.getType());
 
 		timer.scheduleRepeating(refreshRate);
+		
+		// Disable contextual menu
+		disableContextMenu(widgetPanel.asWidget().getElement());
+		disableContextMenu(canvas.asWidget().getElement());
 	}
+
+	public static native void disableContextMenu(Element e) /*-{
+		e.oncontextmenu = function() { return false; };
+	}-*/;
+
 	
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
@@ -164,6 +178,8 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	}
 	
 	public void removeDecoration( Connection decoratedConnection){
+		DecorationShape decoShape = decoratedConnection.getDecoration();
+		widgetPanel.remove(decoShape.asWidget());
 		decoratedConnection.removeDecoration();
 	}
 
@@ -283,18 +299,20 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	/*
 	 * EVENTS
 	 */
-	private void onCtrlClick(){
+	private void showLinkContextualMenu(){
 		final Connection c = getConnectionNearMouse();
 		if(c != null){
 			final PopupPanel popupPanel = new PopupPanel(true);
+			disableContextMenu(popupPanel.getElement());
 			MenuBar popupMenuBar = new MenuBar(true);
 			MenuItem deleteItem = new MenuItem("Delete", true, new Command() {
 				@Override
 				public void execute() {
 					deleteConnection(c);
+					removeDecoration(c);
 					Widget startWidget = ((FunctionShape) c.getStartShape()).asWidget();
 					Widget endWidget = ((FunctionShape) c.getEndShape()).asWidget();
-					fireEvent(new UntieLinkEvent(startWidget, endWidget));
+					fireEvent(new UntieLinkEvent(startWidget, endWidget,c));
 					popupPanel.hide();
 				}
 			});
@@ -315,7 +333,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 			popupMenuBar.setVisible(true);
 			popupPanel.add(popupMenuBar);
-			popupPanel.setPopupPosition(mousePoint.getLeft(), mousePoint.getTop());
+			popupPanel.setPopupPosition(mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
 			popupPanel.show();
 		}
 	}
@@ -325,14 +343,20 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		int mouseY = event.getRelativeY(canvas.getElement());
 		mousePoint.setLeft(mouseX);
 		mousePoint.setTop(mouseY);
+		
+		int offsetMouseX = event.getClientX();
+		int offsetMouseY = event.getClientY();
+		mouseOffsetPoint.setLeft(offsetMouseX);
+		mouseOffsetPoint.setTop(offsetMouseY);
 	}
 
 	private void onMouseUp(MouseUpEvent event){
 
 		// Test if Right Click
-		if(event.isControlKeyDown()){
+		if(event.getNativeButton() == NativeEvent.BUTTON_RIGHT){
+			event.stopPropagation();
 			event.preventDefault();
-			onCtrlClick();
+			showLinkContextualMenu();
 			return;
 		}
 
@@ -345,8 +369,8 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		if(inDragBuildArrow){
 			Widget widgetSelected = getWidgetUnderMouse();
 			if(widgetSelected != null && startFunctionWidget!= widgetSelected){
-				drawStraightArrowConnection(startFunctionWidget, widgetSelected);
-				fireEvent(new TieLinkEvent(startFunctionWidget, widgetSelected));
+				Connection c = drawStraightArrowConnection(startFunctionWidget, widgetSelected);
+				fireEvent(new TieLinkEvent(startFunctionWidget, widgetSelected, c));
 			}
 			canvas.setBackground();
 			connectionSet.remove(buildConnection);
@@ -365,8 +389,8 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	}
 
 	private void onMouseDown(MouseDownEvent event){
-		// Test if Ctrl Click
-		if(event.isControlKeyDown()){
+		// Test if Right Click
+		if(event.getNativeButton() == NativeEvent.BUTTON_RIGHT){
 			return;
 		}
 

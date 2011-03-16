@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.ui.Widget;
+import com.orange.links.client.connection.Connection;
 
 public class UntieLinkEvent extends GwtEvent<UntieLinkHandler>{
 	
@@ -14,10 +15,12 @@ public class UntieLinkEvent extends GwtEvent<UntieLinkHandler>{
 	
 	private Widget startWidget;
 	private Widget endWidget;
+	private Connection connection;
 
-	public UntieLinkEvent(Widget startWidget, Widget endWidget){
+	public UntieLinkEvent(Widget startWidget, Widget endWidget,Connection c){
 		this.setStartWidget(startWidget);
 		this.setEndWidget(endWidget);
+		this.setConnection(c);
 	}
 	
 	private static Type<UntieLinkHandler> TYPE;
@@ -53,4 +56,12 @@ public class UntieLinkEvent extends GwtEvent<UntieLinkHandler>{
 		this.endWidget = endWidget;
 	}
 
+
+	public Connection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+	}
 }

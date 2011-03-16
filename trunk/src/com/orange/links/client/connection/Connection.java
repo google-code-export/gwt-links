@@ -11,6 +11,7 @@ public interface Connection {
 	void draw();
 	MovablePoint addMovablePoint(Point p);
 	void setDecoration(DecorationShape s);
+	DecorationShape getDecoration();
 	void removeDecoration();
 	void setStraight();
 	
