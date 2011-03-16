@@ -8,8 +8,11 @@ public class Rectangle {
 	private Point cornerTopRight;
 	private Point cornerBottomLeft;
 	private Point cornerBottomRight;
+	
+	private Shape shape;
 
 	public Rectangle(Shape s){
+		shape = s;
 		cornerTopLeft = new Point(s.getLeft(),s.getTop());
 		cornerTopRight = new Point(s.getLeft()+s.getWidth(),s.getTop());
 		cornerBottomLeft = new Point(s.getLeft(),s.getTop()+s.getHeight());

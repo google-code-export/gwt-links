@@ -160,7 +160,7 @@ public class ConnectionUtils {
 	}
 
 	/**
-	 * Use to compute tjhe projection of s1 on s2.
+	 * Use to compute the projection of s1 on s2.
 	 * S1 and s2 must be vertical or horizontal
 	 * 
 	 * @return the projected segment on s2

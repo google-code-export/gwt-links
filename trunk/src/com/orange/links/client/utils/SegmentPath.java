@@ -30,12 +30,20 @@ public class SegmentPath {
 	}
 
 	public void update(){
-		Segment startSegment 
-			= ConnectionUtils.computeSegment(this.startShape,new PointShape(pointList.get(1)));
-		pointList.set(0, startSegment.getP1());
-		Segment endSegment 
-			= ConnectionUtils.computeSegment(new PointShape(pointList.get(pointList.size()-2)),this.endShape);
-		pointList.set(pointList.size()-1, endSegment.getP2());
+		if(pointList.size()>2){
+			Segment startSegment 
+				= ConnectionUtils.computeSegment(this.startShape,new PointShape(pointList.get(1)));
+			pointList.set(0, startSegment.getP1());
+			Segment endSegment 
+				= ConnectionUtils.computeSegment(new PointShape(pointList.get(pointList.size()-2)),this.endShape);
+			pointList.set(pointList.size()-1, endSegment.getP2());
+		}
+		else{
+			// There is only one segment
+			Segment s = ConnectionUtils.computeSegment(this.startShape,this.endShape);
+			pointList.set(0, s.getP1());
+			pointList.set(1, s.getP2());
+		}
 	}
 	
 	public Segment getMiddleSegment(){

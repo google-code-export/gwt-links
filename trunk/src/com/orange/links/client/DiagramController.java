@@ -179,8 +179,10 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	
 	public void removeDecoration( Connection decoratedConnection){
 		DecorationShape decoShape = decoratedConnection.getDecoration();
-		widgetPanel.remove(decoShape.asWidget());
-		decoratedConnection.removeDecoration();
+		if(decoShape != null){
+			widgetPanel.remove(decoShape.asWidget());
+			decoratedConnection.removeDecoration();
+		}
 	}
 
 	public void showGrid(boolean showGrid){
