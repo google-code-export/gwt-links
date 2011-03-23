@@ -32,7 +32,8 @@ public class Point {
 	}
 
 	public double distance(Point other){
-		return Math.sqrt( (left-other.left)*(left-other.left) +  (top-other.top)*(top-other.top) );
+		return Math.sqrt( (getLeft()-other.getLeft())*(getLeft()-other.getLeft()) 
+				+  (getTop()-other.getTop())*(getTop()-other.getTop()) );
 	}
 
 	public Point move(Direction dir, int distance){

@@ -1,5 +1,6 @@
 package com.orange.links.client;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,13 +51,14 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	public final static int KEY_CTRL = 17;
 	public static final int minDistanceToSegment = 10;
 	//timer refresh rate, in milliseconds
-	public static final int refreshRate = GWT.isScript() ? 5 : 25;
+	public static final int refreshRate = GWT.isScript() ? 25 : 50;
 
 	private DiagramCanvas canvas;
 	private BackgroundCanvas backgroundCanvas;
 	private AbsolutePanel widgetPanel;
 	private HandlerManager handlerManager;
 	private Map<Widget,FunctionShape> shapeMap;
+	private boolean showGrid;
 
 	private Set<Connection> connectionSet;
 
@@ -75,6 +77,11 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 	private Widget startFunctionWidget;
 	private Connection buildConnection;
+	
+	long nFrame = 0;
+	long previousNFrame = 0;
+	long previousTime = 0;
+	long fps = 0;
 
 	public DiagramController(final DiagramCanvas canvas){
 		this.canvas = canvas;
@@ -119,6 +126,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}, MouseUpEvent.getType());
 
 		timer.scheduleRepeating(refreshRate);
+		frameTimer.scheduleRepeating(1000);
 		
 		// Disable contextual menu
 		disableContextMenu(widgetPanel.asWidget().getElement());
@@ -164,7 +172,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return c;
 	}
 	
-	public void addWidget(Widget w, int left, int top){
+	public void addWidget(final Widget w, int left, int top){
 		w.getElement().getStyle().setZIndex(3);
 		shapeMap.put(w,new FunctionShape(this,w));
 		widgetPanel.add(w, left, top);
@@ -186,7 +194,8 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	}
 
 	public void showGrid(boolean showGrid){
-		if(showGrid){
+		this.showGrid = showGrid;
+		if(this.showGrid){
 			widgetPanel.add(backgroundCanvas.asWidget());
 		}
 		else{
@@ -234,13 +243,34 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return inDragMovablePoint;
 	}
 
+
+	public boolean isShowGrid() {
+		return showGrid;
+	}
+
+	
 	// setup timer
 	private final Timer timer = new Timer() {
 		@Override
 		public void run() {
+			nFrame++;
 			update();
 		}
 	};
+	
+	private final Timer frameTimer = new Timer() {
+		@Override
+		public void run() {
+			long now = new Date().getTime();
+			fps = (nFrame - previousNFrame)*1000/(now-previousTime);
+			previousNFrame = nFrame;
+			previousTime = now;
+		}
+	};
+	
+	public long getFps(){
+		return fps;
+	}
 
 	private void update(){
 		//Restore canvas

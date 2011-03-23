@@ -143,6 +143,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	
 	private void updateEditionPanel(VerticalPanel panel){
 		panel.clear();
+		panel.add(new Label("FPS : " + controller.getFps()));
 		// InDragBuildArrow
 		if(controller.isInDragBuildArrow()){
 			Label dragBuildLabel = new Label("Active : inDragBuildArrow");

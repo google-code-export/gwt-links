@@ -70,11 +70,14 @@ public class StraightArrowConnection extends AbstractConnection implements Conne
 			p1 = pointList.get(i);
 			p2 = pointList.get(i+1);
 			
+			double marginPrev = p1.distance(p0) < cubicMargin ? p1.distance(p0)/4 : cubicMargin;
+			double marginNext = p1.distance(p2) < cubicMargin ? p1.distance(p2)/4 : cubicMargin;
+			
 			// source point
 			Segment prevSegment = new Segment(p0, p1);
 			double prevAngle = prevSegment.getAngleWithTop();
-			double srcx = p1.getLeft()-cubicMargin*Math.cos(prevAngle);
-			double srcy = p1.getTop()-cubicMargin*Math.sin(prevAngle);
+			double srcx = p1.getLeft()-marginPrev*Math.cos(prevAngle);
+			double srcy = p1.getTop()-marginPrev*Math.sin(prevAngle);
 			
 			// control point
 			double cpx = p1.getLeft();
@@ -83,8 +86,8 @@ public class StraightArrowConnection extends AbstractConnection implements Conne
 			// destination point
 			Segment nextSegment = new Segment(p1, p2);
 			double nextAngle = nextSegment.getAngleWithTop();
-			double x = p1.getLeft()+cubicMargin*Math.cos(nextAngle);
-			double y = p1.getTop()+cubicMargin*Math.sin(nextAngle);
+			double x = p1.getLeft()+marginNext*Math.cos(nextAngle);
+			double y = p1.getTop()+marginNext*Math.sin(nextAngle);
 			
 			canvas.lineTo(srcx, srcy);
 			canvas.bezierCurveTo(cpx, cpy, x, y);

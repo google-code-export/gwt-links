@@ -17,5 +17,5 @@
     opacity : 0.3;
     -moz-opacity : 0.3;
     -ms-filter: "alpha(opacity=30)"; /* IE 8 */
-    filter : alpha(opacity=30); /* IE < 8 */
+    filter : alpha(opacity='30'); /* IE < 8 */
   }
