@@ -191,14 +191,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	}
 	
 	private void clear(){
-		globalPanel.remove(controller.getView());
-		MultiBrowserDiagramCanvas canvas = new MultiBrowserDiagramCanvas(tabWidth,tabHeight);
-		controller = new DiagramController(canvas);
-		Widget w = controller.getView();
-		w.getElement().getStyle().setMargin(10, Unit.PX);
-		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
-		controller.showGrid(true);
-		globalPanel.insert(controller.getView(),0);
+		controller.clearDiagram();
 	}
 	
 	private void drawExample1(){

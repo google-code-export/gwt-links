@@ -10,7 +10,7 @@ public class BackgroundCanvas extends MultiBrowserDiagramCanvas{
 		initGrid();
 	}
 
-	private void initGrid(){
+	public void initGrid(){
 		for (double x = 1.5; x < width; x += cellSize) {
 			moveTo(x, 0);
 			lineTo(x, height);

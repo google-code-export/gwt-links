@@ -34,6 +34,9 @@ import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.connection.Connection;
 import com.orange.links.client.connection.StraightArrowConnection;
 import com.orange.links.client.connection.StraightConnection;
+import com.orange.links.client.event.ChangeOnDiagramEvent;
+import com.orange.links.client.event.ChangeOnDiagramEvent.HasChangeOnDiagramHandlers;
+import com.orange.links.client.event.ChangeOnDiagramHandler;
 import com.orange.links.client.event.TieLinkEvent;
 import com.orange.links.client.event.TieLinkEvent.HasTieLinkHandlers;
 import com.orange.links.client.event.TieLinkHandler;
@@ -45,7 +48,7 @@ import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Rectangle;
 
-public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandlers{
+public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandlers,HasChangeOnDiagramHandlers{
 
 	public final static int KEY_D = 68;
 	public final static int KEY_CTRL = 17;
@@ -137,6 +140,18 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		e.oncontextmenu = function() { return false; };
 	}-*/;
 
+	public void clearDiagram(){
+		connectionSet.clear();
+		shapeMap.clear();
+		startFunctionWidget = null;
+		buildConnection = null;
+		
+		// Restart widgetPanel
+		widgetPanel.clear();
+		widgetPanel.add(canvas.asWidget());
+		canvas.getElement().getStyle().setPosition(Position.ABSOLUTE);
+		showGrid(showGrid);
+	}
 	
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
@@ -195,6 +210,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 	public void showGrid(boolean showGrid){
 		this.showGrid = showGrid;
+		backgroundCanvas.initGrid();
 		if(this.showGrid){
 			widgetPanel.add(backgroundCanvas.asWidget());
 		}
@@ -262,7 +278,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		@Override
 		public void run() {
 			long now = new Date().getTime();
-			fps = (nFrame - previousNFrame)*1000/(now-previousTime);
+			fps = (now-previousTime)!= 0 ? (nFrame - previousNFrame)*1000/(now-previousTime) : 0;
 			previousNFrame = nFrame;
 			previousTime = now;
 		}
@@ -493,5 +509,11 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 	private void removeHighlightWidget(Widget w){
 		w.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
+	}
+
+	@Override
+	public HandlerRegistration addChangeOnDiagramHandler(
+			ChangeOnDiagramHandler handler) {
+		return handlerManager.addHandler(ChangeOnDiagramEvent.getType(), handler);
 	}
 }

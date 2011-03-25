@@ -1,5 +1,7 @@
 package com.orange.links.client.connection;
 
+import java.util.List;
+
 import com.orange.links.client.DecorationShape;
 import com.orange.links.client.Shape;
 import com.orange.links.client.utils.MovablePoint;
@@ -12,6 +14,7 @@ public interface Connection {
 	MovablePoint addMovablePoint(Point p);
 	void setDecoration(DecorationShape s);
 	DecorationShape getDecoration();
+	List<Point> getMovablePoints();
 	void removeDecoration();
 	void setStraight();
 	

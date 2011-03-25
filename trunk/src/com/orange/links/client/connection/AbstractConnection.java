@@ -133,6 +133,10 @@ public abstract class AbstractConnection {
 		setHighlightPoint(hPoint);
 		return hPoint;
 	}
+	
+	public List<Point> getMovablePoints(){
+		return segmentPath.getPathWithoutExtremities();
+	}
 
 	public void removeDecoration(){
 		decoration = null;
