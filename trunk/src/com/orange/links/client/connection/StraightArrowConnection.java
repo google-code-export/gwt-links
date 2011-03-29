@@ -17,10 +17,6 @@ public class StraightArrowConnection extends AbstractConnection implements Conne
 		super(controller, startShape, endShape);
 	}
 
-	public StraightArrowConnection(DiagramController controller, Shape startShape, Shape endShape, boolean selectable){
-		super(controller, startShape, endShape, selectable);
-	}
-
 	@Override
 	public void draw(Point p1, Point p2, boolean lastPoint) {
 

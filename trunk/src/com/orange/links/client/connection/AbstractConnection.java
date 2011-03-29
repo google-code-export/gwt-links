@@ -25,13 +25,9 @@ public abstract class AbstractConnection {
 	protected DiagramController controller;
 	protected DiagramCanvas canvas;
 	protected DecorationShape decoration;
-
-	protected boolean selectable;
-	protected boolean selected;
-
+	
 	public static CssColor defaultConnectionColor = CssColor.make("#000000");
 	protected CssColor connectionColor = defaultConnectionColor;
-	public static CssColor selectedConnectionColor = CssColor.make("#FF6600");
 	protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
 
 	protected Point highlightPoint;
@@ -49,12 +45,6 @@ public abstract class AbstractConnection {
 		this.segmentPath = new SegmentPath(startShape,endShape);
 		highlightSegment = this.segmentPath.asStraightPath();
 	}
-
-	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape, boolean selectable){
-		this(controller,startShape,endShape);
-		this.selectable = selectable;
-	}
-
 
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 	protected abstract void draw(List<Point> pointList);
@@ -120,7 +110,7 @@ public abstract class AbstractConnection {
 
 	public Point highlightMovablePoint(Point p) {
 		Point hPoint = findHighlightPoint(p);
-		if(hPoint != null){
+		/*if(hPoint != null){
 			DiagramCanvas canvas = controller.getDiagramCanvas();
 			canvas.beginPath();
 			canvas.arc(hPoint.getLeft(), hPoint.getTop(), 5, 0, Math.PI*2, false);
@@ -129,7 +119,7 @@ public abstract class AbstractConnection {
 			canvas.setFillStyle(highlightPointColor);
 			canvas.fill();
 			canvas.closePath();
-		}
+		}*/
 		setHighlightPoint(hPoint);
 		return hPoint;
 	}
@@ -154,19 +144,6 @@ public abstract class AbstractConnection {
 		return endShape;
 	}
 
-	public void changeSelection() {
-		if(selectable){
-			if(!isSelected()){
-				selected = true;
-				connectionColor = selectedConnectionColor;
-			}
-			else{
-				selected = false;
-				connectionColor = defaultConnectionColor;
-			}
-		}
-	}
-
 	public boolean isMouseNearConnection(Point p){
 		for(Segment s : segmentSet){
 			if( !s.getP1().equals(s.getP2())
@@ -176,24 +153,6 @@ public abstract class AbstractConnection {
 		}
 		return false;
 	}
-
-	public boolean isSelectable() {
-		return selectable;
-	}
-
-	public void unselect() {
-		selected = false;
-		connectionColor = defaultConnectionColor;
-	}
-
-	public boolean isSelected() {
-		return selected;
-	}
-
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-
 
 	public Point getHighlightPoint() {
 		return highlightPoint;

@@ -48,13 +48,24 @@ import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Rectangle;
 
+/**
+ * Controller which manage all the diagram logic
+ * @author Pierre Renaudin (pierre.renaudin.fr@gmail.com)
+ *
+ */
 public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandlers,HasChangeOnDiagramHandlers{
 
-	public final static int KEY_D = 68;
-	public final static int KEY_CTRL = 17;
-	public static final int minDistanceToSegment = 10;
-	//timer refresh rate, in milliseconds
-	public static final int refreshRate = GWT.isScript() ? 25 : 50;
+	/**
+	 * If the distance between the mouse and segment is under this number in pixels, then, 
+	 * the mouse is considered over the segment
+	 */
+	public static int minDistanceToSegment = 10;
+	
+	/**
+	 * Timer refresh duration, in milliseconds. It defers if the application is running in development mode
+	 * or in the web mode
+	 */
+	public static int refreshRate = GWT.isScript() ? 25 : 50;
 
 	private DiagramCanvas canvas;
 	private BackgroundCanvas backgroundCanvas;
@@ -86,6 +97,16 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	long previousTime = 0;
 	long fps = 0;
 
+	/**
+	 * Initialize the controller diagram. Use this constructor to start your diagram. An code sample is :
+	 * <br/><br/>
+	 * <code>
+	 * 		DiagramCanvas canvas = new MultiBrowserDiagramCanvas(400,400);<br/>
+	 *		DiagramController controller = new DiagramController(canvas);<br/>
+	 * </code>
+	 * <br/>
+	 * @param canvas the implementation of the canvas where connections and widgets will be drawn
+	 */
 	public DiagramController(final DiagramCanvas canvas){
 		this.canvas = canvas;
 		this.backgroundCanvas = new BackgroundCanvas(canvas.getWidth(), canvas.getHeight());
@@ -136,10 +157,18 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		disableContextMenu(canvas.asWidget().getElement());
 	}
 
+	/**
+	 * Disable the context menu on a specified element
+	 * 
+	 * @param e the element where we want to disable the context menu
+	 */
 	public static native void disableContextMenu(Element e) /*-{
 		e.oncontextmenu = function() { return false; };
 	}-*/;
 
+	/**
+	 * Clear the diagram (connections and widgets)
+	 */
 	public void clearDiagram(){
 		connectionSet.clear();
 		shapeMap.clear();
@@ -153,6 +182,14 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		showGrid(showGrid);
 	}
 	
+	/**
+	 * Draw a straight connection with an arrow between two GWT widgets. 
+	 * The arrow is pointing to the second widget
+	 * 
+	 * @param startWidget Start widget
+	 * @param endWidget End Widget
+	 * @return the created new connection between the two widgets
+	 */
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
 		if(!shapeMap.containsKey(startWidget)){
@@ -170,6 +207,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return c;
 	}
 	
+	/**
+	 * Draw a straight connection between two GWT widgets. The arrow is pointing to the second widget
+	 * 
+	 * @param startWidget Start widget
+	 * @param endWidget End Widget
+	 * @return the created new connection between the two widgets
+	 */
 	public Connection drawStraightConnection(Widget startWidget, Widget endWidget){
 		// Build Shape for the Widgets
 		if(!shapeMap.containsKey(startWidget)){
@@ -187,12 +231,23 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return c;
 	}
 	
+	/**
+	 * Add a widget on the diagram
+	 * @param w the widget to add
+	 * @param left left margin with the absolute panel
+	 * @param top top margin with the absolute panel
+	 */
 	public void addWidget(final Widget w, int left, int top){
 		w.getElement().getStyle().setZIndex(3);
 		shapeMap.put(w,new FunctionShape(this,w));
 		widgetPanel.add(w, left, top);
 	}
 
+	/**
+	 * Add a widget as a decoration on a connection
+	 * @param decoration widget that will be in the middle of the connection
+	 * @param decoratedConnection the connection where the decoration will be put
+	 */
 	public void addDecoration(Widget decoration, Connection decoratedConnection){
 		decoration.getElement().getStyle().setZIndex(10);
 		decoration.getElement().getStyle().setPosition(Position.ABSOLUTE);
@@ -200,6 +255,11 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		decoratedConnection.setDecoration(new DecorationShape(this, decoration));
 	}
 	
+	/**
+	 * Remove a decoration from the diagram
+	 * 
+	 * @param decoratedConnection connection where the decoration will be deleted
+	 */
 	public void removeDecoration( Connection decoratedConnection){
 		DecorationShape decoShape = decoratedConnection.getDecoration();
 		if(decoShape != null){
@@ -208,6 +268,10 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}
 	}
 
+	/**
+	 * Change the background of the canvas by displaying or not a gray grid.
+	 * @param showGrid if true, show a grid, else don't
+	 */
 	public void showGrid(boolean showGrid){
 		this.showGrid = showGrid;
 		backgroundCanvas.initGrid();
@@ -219,10 +283,18 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}
 	}
 	
+	/**
+	 * Get the diagram canvas
+	 * @return the diagram canvas
+	 */
 	public DiagramCanvas getDiagramCanvas(){
 		return canvas;
 	}
 	
+	/**
+	 * 
+	 * @return the view where the widgets are displayed
+	 */
 	public AbsolutePanel getView(){
 		return widgetPanel;
 	}
@@ -242,24 +314,48 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return handlerManager.addHandler(TieLinkEvent.getType(), handler);
 	}
 
+	@Override
+	public HandlerRegistration addChangeOnDiagramHandler(
+			ChangeOnDiagramHandler handler) {
+		return handlerManager.addHandler(ChangeOnDiagramEvent.getType(), handler);
+	}
 	
+	/**
+	 * 
+	 * @return true if on click, the connection will receive a new movable point
+	 */
 	public boolean isInEditionDragMovablePoint() {
 		return inEditionDragMovablePoint;
 	}
 
+	/**
+	 * 
+	 * @return true if on click, a new build arrow will be drawn between the 
+	 */
 	public boolean isInEditionSelectableShapeToDrawConnection() {
 		return inEditionSelectableShapeToDrawConnection;
 	}
 
+	/**
+	 * 
+	 * @return true if the user is building an arrow (the mouse is down and a arrow is displayed)
+	 */
 	public boolean isInDragBuildArrow() {
 		return inDragBuildArrow;
 	}
 
+	/**
+	 * 
+	 * @return true if the user is dragging a movable point (the mouse is down and a curve is displayed)
+	 */
 	public boolean isInDragMovablePoint() {
 		return inDragMovablePoint;
 	}
 
-
+	/**
+	 * 
+	 * @return true if a grid is displayed in background
+	 */
 	public boolean isShowGrid() {
 		return showGrid;
 	}
@@ -284,6 +380,10 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}
 	};
 	
+	/**
+	 * 
+	 * @return the fps which are really displayed (frame per second)
+	 */
 	public long getFps(){
 		return fps;
 	}
@@ -344,9 +444,6 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 	}
 
-	/*
-	 * EVENTS
-	 */
 	private void showLinkContextualMenu(){
 		final Connection c = getConnectionNearMouse();
 		if(c != null){
@@ -509,11 +606,5 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 	private void removeHighlightWidget(Widget w){
 		w.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
-	}
-
-	@Override
-	public HandlerRegistration addChangeOnDiagramHandler(
-			ChangeOnDiagramHandler handler) {
-		return handlerManager.addHandler(ChangeOnDiagramEvent.getType(), handler);
 	}
 }

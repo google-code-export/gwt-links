@@ -10,16 +10,49 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface DiagramCanvas {
 
+	/**
+	 * Give this diagram canvas as a GWT widget
+	 * @return
+	 */
 	Widget asWidget();
 	
+	/**
+	 * Clear the diagram (the connections for example)
+	 */
 	void clear();
+	
+	/**
+	 * Change the z-index to display the canvas in foreground
+	 */
 	void setForeground();
+	
+	/**
+	 * Change the z-index to display the canvas in background
+	 */
 	void setBackground();
 	
+	/**
+	 * Get width
+	 * @return the width of the canvas
+	 */
 	int getWidth();
+	
+	/**
+	 * Width
+	 * @param the width of the canvas
+	 */
 	void setWidth(int width);
 
+	/**
+	 * Get height
+	 * @return height of the canvas
+	 */
 	int getHeight();
+	
+	/**
+	 * Set height
+	 * @param height of the canvas
+	 */
 	void setHeight(int height);
 	
 	/**
