@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
@@ -73,6 +74,9 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	private HandlerManager handlerManager;
 	private Map<Widget,FunctionShape> shapeMap;
 	private boolean showGrid;
+	
+	private MenuBar contextualMenuBar;
+	private PopupPanel contextualMenuPanel;
 
 	private Set<Connection> connectionSet;
 
@@ -153,8 +157,21 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		frameTimer.scheduleRepeating(1000);
 		
 		// Disable contextual menu
+		contextualMenuPanel = new PopupPanel(true);
+		disableContextMenu(contextualMenuPanel.getElement());
+		contextualMenuBar = new MenuBar(true);
+		contextualMenuPanel.setStyleName(LinksClientBundle.INSTANCE.css().connectionPopup());
+		contextualMenuPanel.add(contextualMenuBar);
 		disableContextMenu(widgetPanel.asWidget().getElement());
 		disableContextMenu(canvas.asWidget().getElement());
+	}
+	
+	public void pauseRefresh(){
+		timer.cancel();
+	}
+	
+	public void runRefresh(){
+		timer.scheduleRepeating(refreshRate);
 	}
 
 	/**
@@ -260,7 +277,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	 * 
 	 * @param decoratedConnection connection where the decoration will be deleted
 	 */
-	public void removeDecoration( Connection decoratedConnection){
+	private void removeDecoration( Connection decoratedConnection){
 		DecorationShape decoShape = decoratedConnection.getDecoration();
 		if(decoShape != null){
 			widgetPanel.remove(decoShape.asWidget());
@@ -297,6 +314,12 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	 */
 	public AbsolutePanel getView(){
 		return widgetPanel;
+	}
+	
+	public ScrollPanel getViewAsScrollPanel(int width, int height){
+		ScrollPanel scrollPanel = new ScrollPanel();
+		scrollPanel.add(widgetPanel);
+		return scrollPanel;
 	}
 	
 	@Override
@@ -387,6 +410,50 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	public long getFps(){
 		return fps;
 	}
+	
+	/**
+	 * Add an option in the contextual menu (on the right click on a connection)
+	 * @param text Text displayed for this option in the menu
+	 * @param command Command fired when the user click on this option
+	 */
+	public void addOptionInContextualMenu(String text, Command command){
+		MenuItem newItem = new MenuItem(text, true, command);
+		newItem.addStyleName(LinksClientBundle.INSTANCE.css().connectionPopupItem());
+		contextualMenuBar.addItem(newItem);
+	}
+	
+	
+	public void addDeleteOptionInContextualMenu(String text){
+		addOptionInContextualMenu(text, new Command() {
+			@Override
+			public void execute() {
+				Connection c = getConnectionNearMouse();
+				deleteConnection(c);
+				Widget startWidget = ((FunctionShape) c.getStartShape()).asWidget();
+				Widget endWidget = ((FunctionShape) c.getEndShape()).asWidget();
+				fireEvent(new UntieLinkEvent(startWidget, endWidget,c));
+				contextualMenuPanel.hide();
+			}
+		});
+	}
+	
+	public void addSetStraightOptionInContextualMenu(String text){
+		addOptionInContextualMenu(text, new Command() {
+			@Override
+			public void execute() {
+				Connection c = getConnectionNearMouse();
+				setStraightConnection(c);
+				contextualMenuPanel.hide();
+			}
+		});
+	}
+	
+	/**
+	 * call to hide the contextual menu
+	 */
+	public void hideContextualMenu(){
+		contextualMenuPanel.hide();
+	}
 
 	private void update(){
 		//Restore canvas
@@ -447,39 +514,9 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	private void showLinkContextualMenu(){
 		final Connection c = getConnectionNearMouse();
 		if(c != null){
-			final PopupPanel popupPanel = new PopupPanel(true);
-			disableContextMenu(popupPanel.getElement());
-			MenuBar popupMenuBar = new MenuBar(true);
-			MenuItem deleteItem = new MenuItem("Delete", true, new Command() {
-				@Override
-				public void execute() {
-					deleteConnection(c);
-					removeDecoration(c);
-					Widget startWidget = ((FunctionShape) c.getStartShape()).asWidget();
-					Widget endWidget = ((FunctionShape) c.getEndShape()).asWidget();
-					fireEvent(new UntieLinkEvent(startWidget, endWidget,c));
-					popupPanel.hide();
-				}
-			});
-			MenuItem straightItem = new MenuItem("Set straight", true, new Command() {
-				@Override
-				public void execute() {
-					setStraightConnection(c);
-					popupPanel.hide();
-				}
-			});
-
-			popupPanel.setStyleName(LinksClientBundle.INSTANCE.css().connectionPopup());
-			deleteItem.addStyleName(LinksClientBundle.INSTANCE.css().connectionPopupItem());
-			straightItem.addStyleName(LinksClientBundle.INSTANCE.css().connectionPopupItem());
-
-			popupMenuBar.addItem(deleteItem);
-			popupMenuBar.addItem(straightItem);
-
-			popupMenuBar.setVisible(true);
-			popupPanel.add(popupMenuBar);
-			popupPanel.setPopupPosition(mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
-			popupPanel.show();
+			contextualMenuBar.setVisible(true);
+			contextualMenuPanel.setPopupPosition(mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
+			contextualMenuPanel.show();
 		}
 	}
 
@@ -559,8 +596,9 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	 * CONNECTION MANAGEMENT METHODS
 	 */
 
-	private void deleteConnection(Connection c){
+	public void deleteConnection(Connection c){
 		connectionSet.remove(c);
+		removeDecoration(c);
 	}
 
 	private void setStraightConnection(Connection c){

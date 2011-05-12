@@ -71,7 +71,7 @@ public class FunctionShape implements Shape{
 					closestSelectablePoint.getTop(), selectableAreaRadius,
 					direction.getAngle()-Math.PI/2,
 					direction.getAngle()+Math.PI/2,
-					direction.equals(Direction.UP) || direction.equals(Direction.DOWN));
+					direction.equals(Direction.N) || direction.equals(Direction.S));
 			canvas.setStrokeStyle(highlightSelectableAreaColor);
 			canvas.stroke();
 			canvas.setFillStyle(highlightSelectableAreaColor);
@@ -87,16 +87,16 @@ public class FunctionShape implements Shape{
 		Point centerS = new Point(getLeft()+getWidth()/2,getTop()+getHeight()-1);
 		Point centerE = new Point(getLeft()+getWidth()-1,getTop()+getHeight()/2);
 		if(p.distance(centerW) <= selectableAreaRadius){
-			return new Couple<Direction, Point>(Direction.LEFT, centerW);
+			return new Couple<Direction, Point>(Direction.W, centerW);
 		}
 		else if(p.distance(centerN) <= selectableAreaRadius){
-			return new Couple<Direction, Point>(Direction.UP, centerN);
+			return new Couple<Direction, Point>(Direction.N, centerN);
 		}
 		else if(p.distance(centerS) <= selectableAreaRadius){
-			return new Couple<Direction, Point>(Direction.DOWN, centerS);
+			return new Couple<Direction, Point>(Direction.S, centerS);
 		}
 		else if(p.distance(centerE) <= selectableAreaRadius){
-			return new Couple<Direction, Point>(Direction.RIGHT, centerE);
+			return new Couple<Direction, Point>(Direction.E, centerE);
 		}
 		return null;
 	}

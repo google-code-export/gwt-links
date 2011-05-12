@@ -10,7 +10,9 @@ import com.google.gwt.dom.client.Style.FontWeight;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -221,6 +223,14 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		
 		// Add the logic
 		controller.drawStraightArrowConnection(labelHello, labelWorld);
+		controller.addDeleteOptionInContextualMenu("*Delete*");
+		controller.addSetStraightOptionInContextualMenu("*Set Straight*"); 
+		controller.addOptionInContextualMenu("Hello World !", new Command() {
+			@Override
+			public void execute() {
+				Window.alert("Hello Mickey ;)");
+			}
+		});
 	}
 	
 	private void drawExample2(){

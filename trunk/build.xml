@@ -3,7 +3,7 @@
 
 	<property file="build.properties"/>
 	<property name="gwt.links.artifactId" value="gwt-links"/>
-	<property name="gwt.links.version" value="1.0"/>
+	<property name="gwt.links.version" value="1.2"/>
 	<property name="gwt.links.packaging" value="jar"/>
 	<property name="lib.dir"     value="lib"/>
 	<property name="gwt.links.artifactFileName" value="${gwt.links.artifactId}-${gwt.links.version}.${gwt.links.packaging}"/>

@@ -10,7 +10,7 @@ import com.orange.links.client.Shape;
 
 public class ConnectionUtils {
 
-	public static Segment createSegment(Shape startShape, Shape endShape){
+	public static Segment computeFasterSegment(Shape startShape, Shape endShape){
 		Direction[] d = computeDirections(startShape, endShape);
 
 		Point p1 = pointOnBorder(d[0],startShape);
@@ -35,7 +35,6 @@ public class ConnectionUtils {
 				}
 			}
 		}
-
 		return bestDirections;
 	}
 
@@ -61,6 +60,7 @@ public class ConnectionUtils {
 	public static Segment computeSegment(Shape s1, Shape s2) {
 		return computeSegment(new Rectangle(s1), new Rectangle(s2));
 	}
+	
 
 	public static Segment computeSegment(Rectangle r1, Rectangle r2) {
 
@@ -255,8 +255,17 @@ public class ConnectionUtils {
 	}
 
 	private static Point pointOnBorder(Direction d, Shape s){
-		Point p = new Point( s.getLeft() + s.getWidth()/2, s.getTop() + s.getHeight()/2 )
-		.move(d, ((d.isHorizontal())? s.getWidth()/2 : s.getHeight()/2));
+		
+		// Compute distance
+		int distance;
+		if(d.isHorizontal())
+			distance = s.getWidth()/2;
+		else if(d.isVertical())
+			distance = s.getHeight()/2;
+		else
+			distance = (int) Math.sqrt( Math.pow(s.getWidth(),2) +  Math.pow(s.getHeight(),2)) /2;
+			
+		Point p = new Point(s.getLeft()+s.getWidth()/2,s.getTop()+s.getHeight()/2).move(d,distance);
 		p.setDirection(d);
 		return p;
 	}

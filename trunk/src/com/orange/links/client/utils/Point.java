@@ -37,13 +37,21 @@ public class Point {
 	}
 
 	public Point move(Direction dir, int distance){
-		if( dir == Direction.DOWN ){
+		if( dir == Direction.S ){
 			return new Point(left, top+distance);
-		} else if( dir == Direction.UP ){
+		} else if( dir == Direction.SE ){
+			return new Point(left+Math.cos(distance), top-Math.sin(distance));
+		} else if( dir == Direction.SW ){
+			return new Point(left-Math.cos(distance), top-Math.sin(distance));
+		} else if( dir == Direction.N ){
 			return new Point(left, top-distance);
-		} else if( dir == Direction.LEFT ){
+		} else if( dir == Direction.NE ){
+			return new Point(left+Math.cos(distance), top+Math.sin(distance));
+		} else if( dir == Direction.NW ){
+			return new Point(left-Math.cos(distance), top+Math.sin(distance));
+		} else if( dir == Direction.W ){
 			return new Point(left-distance, top);
-		} else if( dir == Direction.RIGHT ){
+		} else if( dir == Direction.E ){
 			return new Point(left+distance, top);
 		} else {
 			throw new IllegalStateException();

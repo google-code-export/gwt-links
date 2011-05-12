@@ -5,7 +5,7 @@
 	<classpathentry kind="src" path="demo"/>
 	<classpathentry kind="lib" path="E:/Outils/eclipse-3.6/plugins/gwt-2.2.0/gwt-user.jar"/>
 	<classpathentry kind="lib" path="E:/Outils/eclipse-3.6/plugins/gwt-2.2.0/gwt-dev.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_24"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/gwt-incubator.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>

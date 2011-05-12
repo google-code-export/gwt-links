@@ -3,10 +3,14 @@ package com.orange.links.client.utils;
 
 public class Direction {
 
-    public static final Direction UP = new Direction("UP", Math.PI/2);
-    public static final Direction DOWN = new Direction("DOWN", 3*Math.PI/2);
-    public static final Direction LEFT = new Direction("LEFT", Math.PI);
-    public static final Direction RIGHT = new Direction("RIGHT", 0);
+    public static final Direction N = new Direction("N", Math.PI/2);
+    public static final Direction NE = new Direction("NE", Math.PI/2);
+    public static final Direction NW = new Direction("NE", Math.PI/2);
+    public static final Direction S = new Direction("S", 3*Math.PI/2);
+    public static final Direction SW = new Direction("SW", 3*Math.PI/2);
+    public static final Direction SE = new Direction("SE", 3*Math.PI/2);
+    public static final Direction E = new Direction("E", Math.PI);
+    public static final Direction W = new Direction("W", 0);
     
     private final String id;
     private final double angle;
@@ -20,21 +24,21 @@ public class Direction {
      * @return all defined directions
      */
     public static Direction[] getAll(){
-    	return new Direction[]{UP, DOWN, LEFT, RIGHT};
+    	return new Direction[]{S, E, W, N,SE,SW,NE,NW};
     }
     
     /**
      * @return true if it is horizontal direction
      */
     public boolean isHorizontal(){
-    	return this == LEFT || this == RIGHT;
+    	return this == W || this == E;
     }
     
     /**
      * @return true if it is vertical direction
      */
     public boolean isVertical(){
-    	return this == UP || this == DOWN;
+    	return this == N || this == S;
     }
 
     /**
