@@ -4,7 +4,7 @@
 == What's new in gwt-links-1.2.jar ?==
 
 === Bug Fixes ===
- * [http://code.google.com/p/gwt-links/issues/detail?id=5 Issue 5] : Add a specific exception to notify the developper that the view has to be added to the RootPanel (or a widget).
+ * [http://code.google.com/p/gwt-links/issues/detail?id=5 Issue 5] : Add a specific exception to notify the developper that the view has to be added to the RootPanel or a widget.
 
 === New in this release ===
  * [http://code.google.com/p/gwt-links/issues/detail?id=3 Issue 3] : Add specific options in the contextual menu (on right click) with :
