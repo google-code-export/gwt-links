@@ -2,12 +2,13 @@ package com.orange.links.client;
 
 import junit.framework.TestCase;
 
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.SegmentPath;
 
 public class SegmentPathTest extends TestCase{
 
-	public void testComplete(){
+	public void testComplete() throws DiagramViewNotDisplayedException{
 		Point sPoint = new Point(1,1);
 		Point ePoint = new Point(5,4);
 		SegmentPath segmentPath = new SegmentPath(new PointShape(sPoint),new PointShape(ePoint));

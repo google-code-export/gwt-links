@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.orange.links.client.PointShape;
 import com.orange.links.client.Shape;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 
 public class SegmentPath {
 
@@ -12,7 +13,7 @@ public class SegmentPath {
 	private Shape endShape;
 	private List<Point> pointList;
 
-	public SegmentPath(Shape startShape, Shape endShape){
+	public SegmentPath(Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
 		this.startShape = startShape;
 		this.endShape = endShape;
 		straightPath();
@@ -29,7 +30,7 @@ public class SegmentPath {
 		}
 	}
 
-	public void update(){
+	public void update() throws DiagramViewNotDisplayedException{
 		if(pointList.size()>2){
 			Segment startSegment 
 				= ConnectionUtils.computeSegment(this.startShape,new PointShape(pointList.get(1)));
@@ -41,6 +42,8 @@ public class SegmentPath {
 		else{
 			// There is only one segment
 			Segment s = ConnectionUtils.computeSegment(this.startShape,this.endShape);
+			if(s == null)
+				throw new DiagramViewNotDisplayedException();
 			pointList.set(0, s.getP1());
 			pointList.set(1, s.getP2());
 		}
@@ -76,9 +79,11 @@ public class SegmentPath {
 		return new ArrayList<Point>();
 	}
 
-	public void straightPath(){
+	public void straightPath() throws DiagramViewNotDisplayedException{
 		Segment s = ConnectionUtils.computeSegment(this.startShape,this.endShape);
 		pointList = new ArrayList<Point>();
+		if(s == null)
+			throw new DiagramViewNotDisplayedException();
 		pointList.add(s.getP1());
 		pointList.add(s.getP2());
 	}

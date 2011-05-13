@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.Shape;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 
@@ -13,12 +14,12 @@ public class StraightArrowConnection extends AbstractConnection implements Conne
 	private int cubicMargin = 25;
 	private double arrowAngle = Math.PI/8;
 	
-	public StraightArrowConnection(DiagramController controller, Shape startShape, Shape endShape){
+	public StraightArrowConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
 		super(controller, startShape, endShape);
 	}
 
 	@Override
-	public void draw(Point p1, Point p2, boolean lastPoint) {
+	public void draw(Point p1, Point p2, boolean lastPoint){
 
 		canvas.beginPath();
 		canvas.moveTo(p1.getLeft(),p1.getTop());

@@ -11,6 +11,7 @@ import com.orange.links.client.DecorationShape;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.Shape;
 import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.ConnectionUtils;
 import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
@@ -34,7 +35,7 @@ public abstract class AbstractConnection {
 	protected Segment highlightSegment;
 	protected SegmentPath segmentPath;
 
-	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape){
+	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
 		this.controller = controller;
 		this.startShape = startShape;
 		this.endShape = endShape;
@@ -49,7 +50,7 @@ public abstract class AbstractConnection {
 	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 	protected abstract void draw(List<Point> pointList);
 
-	public void draw(){
+	public void draw() throws DiagramViewNotDisplayedException{
 		// Reset the segments
 		segmentSet = new HashSet<Segment>();
 
@@ -132,7 +133,7 @@ public abstract class AbstractConnection {
 		decoration = null;
 	}
 	
-	public void setStraight(){
+	public void setStraight() throws DiagramViewNotDisplayedException{
 		segmentPath.straightPath();
 	}
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.Shape;
 import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 
@@ -13,7 +14,7 @@ public class StraightConnection extends AbstractConnection implements Connection
 	private int cubicMargin = 25;
 	
 	public StraightConnection(DiagramController controller, Shape startShape,
-			Shape endShape) {
+			Shape endShape) throws DiagramViewNotDisplayedException {
 		super(controller, startShape, endShape);
 	}
 	

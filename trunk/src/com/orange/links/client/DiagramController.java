@@ -6,6 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.allen_sauer.gwt.dnd.client.DragController;
+import com.allen_sauer.gwt.dnd.client.DragEndEvent;
+import com.allen_sauer.gwt.dnd.client.DragHandler;
+import com.allen_sauer.gwt.dnd.client.DragStartEvent;
+import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
@@ -28,7 +33,6 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
@@ -44,6 +48,7 @@ import com.orange.links.client.event.TieLinkHandler;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkEvent.HasUntieLinkHandlers;
 import com.orange.links.client.event.UntieLinkHandler;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.LinksClientBundle;
 import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
@@ -69,6 +74,7 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	public static int refreshRate = GWT.isScript() ? 25 : 50;
 
 	private DiagramCanvas canvas;
+	private DragController dragController;
 	private BackgroundCanvas backgroundCanvas;
 	private AbsolutePanel widgetPanel;
 	private HandlerManager handlerManager;
@@ -218,7 +224,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}
 		Shape endShape = shapeMap.get(endWidget);
 		// Create Connection and Store it in the controller
-		Connection c = new StraightArrowConnection(this, startShape, endShape);
+		Connection c;
+		try {
+			c = new StraightArrowConnection(this, startShape, endShape);
+		} catch (DiagramViewNotDisplayedException e) {
+			e.printStackTrace();
+			return null;
+		}
 
 		connectionSet.add(c);
 		return c;
@@ -242,7 +254,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		}
 		Shape endShape = shapeMap.get(endWidget);
 		// Create Connection and Store it in the controller
-		Connection c = new StraightConnection(this, startShape, endShape);
+		Connection c;
+		try {
+			c = new StraightConnection(this, startShape, endShape);
+		} catch (DiagramViewNotDisplayedException e) {
+			e.printStackTrace();
+			return null;
+		}
 
 		connectionSet.add(c);
 		return c;
@@ -277,13 +295,35 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 	 * 
 	 * @param decoratedConnection connection where the decoration will be deleted
 	 */
-	private void removeDecoration( Connection decoratedConnection){
+	public void removeDecoration( Connection decoratedConnection){
 		DecorationShape decoShape = decoratedConnection.getDecoration();
 		if(decoShape != null){
 			widgetPanel.remove(decoShape.asWidget());
 			decoratedConnection.removeDecoration();
 		}
 	}
+	
+	/**
+	 * Add an segment on a path by adding a point on the connection
+	 * @param c the connection where the point will be added
+	 * @param left Left margin in pixels
+	 * @param top Top margin in pixels
+	 */
+	public void addPointOnConnection(Connection c,int left, int top){
+		c.addMovablePoint(new Point(left, top));
+	}
+	
+	/**
+	 * 
+	 */
+	public void straightenConnection(Connection c){
+		try {
+			c.setStraight();
+		} catch (DiagramViewNotDisplayedException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	/**
 	 * Change the background of the canvas by displaying or not a gray grid.
@@ -316,10 +356,35 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		return widgetPanel;
 	}
 	
-	public ScrollPanel getViewAsScrollPanel(int width, int height){
-		ScrollPanel scrollPanel = new ScrollPanel();
-		scrollPanel.add(widgetPanel);
-		return scrollPanel;
+	/**
+	 * Register a drag controller to control the refresh rate
+	 * @param dragController The DragController used to handle the drags on widgets
+	 */
+	public void registerDragController(DragController dragController){
+		this.dragController = dragController; 
+		// Register on grad controller
+		dragController.addDragHandler(new DragHandler() {
+			@Override
+			public void onPreviewDragStart(DragStartEvent event)
+					throws VetoDragException {
+				runRefresh();
+			}
+			
+			@Override
+			public void onPreviewDragEnd(DragEndEvent event) throws VetoDragException {
+				
+			}
+			
+			@Override
+			public void onDragStart(DragStartEvent event) {
+				
+			}
+			
+			@Override
+			public void onDragEnd(DragEndEvent event) {
+				pauseRefresh();
+			}
+		});
 	}
 	
 	@Override
@@ -422,7 +487,10 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		contextualMenuBar.addItem(newItem);
 	}
 	
-	
+	/**
+	 * Add an delete option in the contextual menu (on the right click on a connection)
+	 * @param text Text displayed for the delete option in the menu
+	 */
 	public void addDeleteOptionInContextualMenu(String text){
 		addOptionInContextualMenu(text, new Command() {
 			@Override
@@ -437,12 +505,16 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		});
 	}
 	
+	/**
+	 * Add an "set straight" option in the contextual menu (on the right click on a connection)
+	 * @param text Text displayed for the "set straight" option in the menu
+	 */
 	public void addSetStraightOptionInContextualMenu(String text){
 		addOptionInContextualMenu(text, new Command() {
 			@Override
 			public void execute() {
 				Connection c = getConnectionNearMouse();
-				setStraightConnection(c);
+				straightenConnection(c);
 				contextualMenuPanel.hide();
 			}
 		});
@@ -461,7 +533,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 
 		// Redraw Connections
 		for(Connection c : connectionSet){
-			c.draw();
+			try {
+				c.draw();
+			} catch (DiagramViewNotDisplayedException e) {
+				e.printStackTrace();
+				pauseRefresh();
+				break;
+			}
 		}
 
 		// Search for selectable area
@@ -601,10 +679,6 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		removeDecoration(c);
 	}
 
-	private void setStraightConnection(Connection c){
-		c.setStraight();
-	}
-
 	private Connection getConnectionNearMouse(){
 		for(Connection c : connectionSet){
 			if(c.isMouseNearConnection(mousePoint)){
@@ -618,7 +692,13 @@ public class DiagramController implements HasTieLinkHandlers,HasUntieLinkHandler
 		canvas.setForeground();
 		Shape startShape = new FunctionShape(this,startFunctionWidget);
 		final MouseShape endShape = new MouseShape(mousePoint);
-		final Connection c = new StraightArrowConnection(this, startShape, endShape);
+		Connection c;
+		try {
+			c = new StraightArrowConnection(this, startShape, endShape);
+		} catch (DiagramViewNotDisplayedException e) {
+			e.printStackTrace();
+			return;
+		}
 		connectionSet.add(c);
 		buildConnection = c;
 	}

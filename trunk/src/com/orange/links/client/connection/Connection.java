@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.orange.links.client.DecorationShape;
 import com.orange.links.client.Shape;
+import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 
@@ -12,7 +13,7 @@ public interface Connection {
 	/**
 	 *  Draw the connection on the global canvas
 	 */
-	void draw();
+	void draw() throws DiagramViewNotDisplayedException;
 	
 	/**
 	 * Add a fixed point on a connection called movable point
@@ -47,7 +48,7 @@ public interface Connection {
 	/**
 	 * Delete alle the movable point and then, the connection is straight
 	 */
-	void setStraight();
+	void setStraight() throws DiagramViewNotDisplayedException;
 	
 	/**
 	 *  Return the start container
