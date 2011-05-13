@@ -39,6 +39,9 @@ public class Example2 extends AbstractExample{
 		decorationLabel.getElement().getStyle().setPadding(5, Unit.PX);
 		decorationLabel.getElement().getStyle().setProperty("border", "1px solid black");
 		controller.addDecoration(decorationLabel, c1);
+		
+		controller.addDeleteOptionInContextualMenu("Delete");
+		controller.addSetStraightOptionInContextualMenu("Set Straight");
 	}
 
 	@Override

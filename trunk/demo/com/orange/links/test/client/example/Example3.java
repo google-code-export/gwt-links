@@ -36,6 +36,9 @@ public class Example3  extends AbstractExample{
 		controller.addPointOnConnection(c2, 50, 50);
 		controller.addPointOnConnection(c2, 75, 75);
 		controller.addPointOnConnection(c2, 150, 25);
+
+		controller.addDeleteOptionInContextualMenu("Delete");
+		controller.addSetStraightOptionInContextualMenu("Set Straight");
 	}
 
 	@Override
