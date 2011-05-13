@@ -7,13 +7,20 @@
  * [http://code.google.com/p/gwt-links/issues/detail?id=5 Issue 5] : Add a specific exception to notify the developper that the view has to be added to the RootPanel (or a widget).
 
 === New in this release ===
- * Add specific options in the contextual menu (on right click) with :
+ * [http://code.google.com/p/gwt-links/issues/detail?id=3 Issue 3] : Add specific options in the contextual menu (on right click) with :
 {{{
+// Diagram Controller
 public void addOptionInContextualMenu(String text, Command command);
 public void addDeleteOptionInContextualMenu(String text);
 public void addSetStraightOptionInContextualMenu(String text);
 }}}
 
+ * [http://code.google.com/p/gwt-links/issues/detail?id=4 Issue 4] : Manage a segment directly with the API to add line segments or straighten a segment :
+{{{
+//Diagram Controller
+public void addPointOnConnection(Connection c,int left, int right);
+public void straightenConnection(Connection c);
+}}}
 
 
 == What's new in gwt-links-1.1.1.jar ?==
