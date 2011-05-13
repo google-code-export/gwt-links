@@ -1,5 +1,5 @@
 #summary Release Notes for gwt-links
-#labels ReleaseNotes
+#labels ReleaseNotes,Featured
 
 == What's new in gwt-links-1.2.jar ?==
 
