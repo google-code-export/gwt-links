@@ -1,10 +1,10 @@
 #summary New features to include in the next release
 #labels Roadmap,Featured
 
-= New features to develop =
+== New features to develop ==
 
   * Improve the refresh system
   * Stop refreshing when nothing happens
 
 
-= Features to test before the next release =
+== Features to test before the next release ==
