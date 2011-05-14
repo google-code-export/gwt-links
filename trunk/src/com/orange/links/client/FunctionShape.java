@@ -1,58 +1,19 @@
 package com.orange.links.client;
 
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.Couple;
 import com.orange.links.client.utils.Direction;
 import com.orange.links.client.utils.Point;
 
-public class FunctionShape implements Shape{
+public class FunctionShape extends AbstractShape{
 
-	private Widget widget;
 	private int selectableAreaRadius = 7;
-	private DiagramController controller;
 	private CssColor highlightSelectableAreaColor = CssColor.make("#FF6600");
 
 	public FunctionShape(DiagramController controller, Widget widget){
-		this.widget = widget;
-		this.controller = controller;
-	}
-
-	public int getLeft() {
-		int containerOffset = 0;
-		Element parent = DOM.getParent(widget.getElement());
-		while( parent!=null ){
-			if( "relative".equals(DOM.getStyleAttribute(parent, "position")) ){
-				containerOffset = DOM.getAbsoluteLeft(parent);
-				break;
-			}
-			parent = DOM.getParent(parent);
-		}
-		return widget.getAbsoluteLeft() - containerOffset;
-	}
-
-	public int getTop() {
-		int containerOffset = 0;
-		Element parent = DOM.getParent(widget.getElement());
-		while( parent!=null ){
-			if( "relative".equals(DOM.getStyleAttribute(parent, "position")) ){
-				containerOffset = DOM.getAbsoluteTop(parent);
-				break;
-			}
-			parent = DOM.getParent(parent);
-		}
-		return widget.getAbsoluteTop() - containerOffset;
-	}
-
-	public int getWidth() {
-		return widget.getOffsetWidth();
-	}
-
-	public int getHeight() {
-		return widget.getOffsetHeight();
+		super(controller, widget);
 	}
 
 	public boolean isMouseNearSelectableArea(Point mousePoint){
@@ -101,7 +62,5 @@ public class FunctionShape implements Shape{
 		return null;
 	}
 
-	public Widget asWidget(){
-		return widget;
-	}
+	
 }
