@@ -3,9 +3,8 @@
 
 = New features to develop =
 
-* Improve the refresh system
-* Stop refreshing when nothing happens
+  * Improve the refresh system
+  * Stop refreshing when nothing happens
 
 
 = Features to test before the next release =
-
