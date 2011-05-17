@@ -1,5 +1,7 @@
 package com.orange.links.client.utils;
 
+import com.orange.links.client.shapes.Shape;
+
 
 public class Point {
 	protected int left;
@@ -86,6 +88,15 @@ public class Point {
 	public boolean equals(Point p){
 		return p.getLeft() == left && p.getTop() == top;
 	}
+	
+	public boolean isInside(Shape s) {
+	    Rectangle r = new Rectangle(s);
+        return getLeft() >= r.getLeft() 
+        && getTop() >= r.getTop()
+        && getLeft() <= r.getLeft() + r.getWidth()
+        && getTop() <= r.getTop() + r.getHeight();
+	}
+	
 	
 	@Override
 	public String toString(){

@@ -1,4 +1,4 @@
-package com.orange.links.client;
+package com.orange.links.client.shapes;
 
 import com.orange.links.client.utils.Point;
 

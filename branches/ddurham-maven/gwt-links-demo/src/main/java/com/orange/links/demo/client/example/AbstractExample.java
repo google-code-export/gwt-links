@@ -1,4 +1,4 @@
-package com.orange.links.test.client.example;
+package com.orange.links.demo.client.example;
 
 import com.orange.links.client.DiagramController;
 

@@ -1,4 +1,4 @@
-package com.orange.links.test.client;
+package com.orange.links.demo.client;
 
 
 import java.util.Date;
@@ -19,11 +19,11 @@ import com.orange.links.client.event.TieLinkEvent;
 import com.orange.links.client.event.TieLinkHandler;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkHandler;
-import com.orange.links.test.client.example.AbstractExample;
-import com.orange.links.test.client.example.Example1;
-import com.orange.links.test.client.example.Example2;
-import com.orange.links.test.client.example.Example3;
-import com.orange.links.test.client.widgets.ExampleMenuElement;
+import com.orange.links.demo.client.example.AbstractExample;
+import com.orange.links.demo.client.example.Example1;
+import com.orange.links.demo.client.example.Example2;
+import com.orange.links.demo.client.example.Example3;
+import com.orange.links.demo.client.widgets.ExampleMenuElement;
 
 public class GwtLinksTestEntryPoint implements EntryPoint {
 	

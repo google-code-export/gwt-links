@@ -52,7 +52,7 @@
                 <artifactId>gwt-maven-plugin</artifactId>
                 <version>${gwt.version}</version>
                 <configuration>
-                    <module>com.orange.links.test.Gwt_links_test.gwt.xml</module>
+                    <module>com.orange.links.demo.Gwt_links_test</module>
                     <inplace>true</inplace>
                     <runTarget>index.html</runTarget>
                 </configuration>

@@ -1,7 +1,8 @@
-package com.orange.links.client;
+package com.orange.links.client.shapes;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.Widget;
+import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.Couple;
 import com.orange.links.client.utils.Direction;

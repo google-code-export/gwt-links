@@ -1,8 +1,9 @@
-package com.orange.links.client;
+package com.orange.links.client.shapes;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
+import com.orange.links.client.DiagramController;
 
 public abstract class AbstractShape implements Shape{
 

@@ -1,4 +1,4 @@
-package com.orange.links.test.client.widgets;
+package com.orange.links.demo.client.widgets;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;

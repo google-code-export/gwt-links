@@ -7,169 +7,208 @@ import java.util.Set;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.Style.Unit;
-import com.orange.links.client.DecorationShape;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
-import com.orange.links.client.Shape;
 import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.menu.ContextMenu;
+import com.orange.links.client.menu.HasContextMenu;
+import com.orange.links.client.shapes.DecorationShape;
+import com.orange.links.client.shapes.FunctionShape;
+import com.orange.links.client.shapes.Shape;
 import com.orange.links.client.utils.ConnectionUtils;
 import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 import com.orange.links.client.utils.SegmentPath;
 
-public abstract class AbstractConnection {
+public abstract class AbstractConnection implements Connection {
 
-	protected Shape startShape;
-	protected Shape endShape;
-	protected Set<Segment> segmentSet;
-	protected DiagramController controller;
-	protected DiagramCanvas canvas;
-	protected DecorationShape decoration;
-	
-	public static CssColor defaultConnectionColor = CssColor.make("#000000");
-	protected CssColor connectionColor = defaultConnectionColor;
-	protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
+    protected Shape startShape;
+    protected Shape endShape;
+    protected Set<Segment> segmentSet;
+    protected DiagramController controller;
+    protected DiagramCanvas canvas;
+    protected DecorationShape decoration;
 
-	protected Point highlightPoint;
-	protected Segment highlightSegment;
-	protected SegmentPath segmentPath;
+    public static CssColor defaultConnectionColor = CssColor.make("#000000");
+    protected CssColor connectionColor = defaultConnectionColor;
+    protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
 
-	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
-		this.controller = controller;
-		this.startShape = startShape;
-		this.endShape = endShape;
-		this.segmentSet = new HashSet<Segment>();
-		this.canvas = controller.getDiagramCanvas();
+    protected Point highlightPoint;
+    protected Segment highlightSegment;
+    protected SegmentPath segmentPath;
 
-		// Build Path
-		this.segmentPath = new SegmentPath(startShape,endShape);
-		highlightSegment = this.segmentPath.asStraightPath();
-	}
+    protected ContextMenu menu;
 
-	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
-	protected abstract void draw(List<Point> pointList);
+    public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
+        this.controller = controller;
+        this.startShape = startShape;
+        this.endShape = endShape;
+        this.segmentSet = new HashSet<Segment>();
+        this.canvas = controller.getDiagramCanvas();
 
-	public void draw() throws DiagramViewNotDisplayedException{
-		// Reset the segments
-		segmentSet = new HashSet<Segment>();
+        // Build Path
+        this.segmentPath = new SegmentPath(startShape, endShape);
+        highlightSegment = this.segmentPath.asStraightPath();
 
-		// Draw each segment
-		segmentPath.update();
-		List<Point> pointList = new ArrayList<Point>();
-		Point startPoint = segmentPath.getFirstPoint();
-		pointList.add(startPoint);
-		for(Point p : segmentPath.getPathWithoutExtremities()){
-			Point endPoint = p;
-			//draw(startPoint, endPoint, false);
-			pointList.add(endPoint);
-			segmentSet.add(new Segment(startPoint,endPoint));
-			startPoint = endPoint;
-		}
-		// Draw last segment
-		Point lastPoint = segmentPath.getLastPoint();
-		pointList.add(lastPoint);
-		segmentSet.add(new Segment(startPoint,lastPoint));
-		//draw(startPoint, lastPoint,true);
+        initMenu();
 
-		// Draw All the register point
-		draw(pointList);
+    }
 
-		updateDecoration();
-	}
+    protected void initMenu() {
+        menu = new ContextMenu();
+        menu.addItem(new MenuItem("Delete", true, new Command() {
+            public void execute() {
+                // fireEvent
+                Widget startWidget = ((FunctionShape) getStartShape()).asWidget();
+                Widget endWidget = ((FunctionShape) getEndShape()).asWidget();
+                controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
+                controller.deleteConnection(AbstractConnection.this);
+                menu.hide();
+            }
+        }));
 
-	private void updateDecoration(){
-		if(decoration != null){
-			Segment decoratedSegment = segmentPath.getMiddleSegment();
-			Point decorationCenter = decoratedSegment.middle();
-			int width = decoration.getWidth();
-			int height = decoration.getHeight();
-			decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop()-height/2, Unit.PX);
-			decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft()-width/2, Unit.PX);
-		}
-	}
+        menu.addItem(new MenuItem("Straighten", true, new Command() {
+            public void execute() {
+                setStraight();
+                menu.hide();
+            }
+        }));
+    }
 
-	public MovablePoint addMovablePoint(Point p){
-		Point startSegmentPoint = highlightSegment.getP1();
-		Point endSegmentPoint = highlightSegment.getP2();
-		MovablePoint movablePoint = new MovablePoint(p);
-		segmentPath.add(movablePoint, startSegmentPoint, endSegmentPoint);
-		return movablePoint;
-	}
+    protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 
-	private Point findHighlightPoint(Point p){
-		for(Segment s : segmentSet){
-			if(ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
-				Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
-				highlightSegment = s;
-				highlightPoint = hPoint;
-				return highlightPoint;
-			}
-		}
-		return null;
-	}
+    protected abstract void draw(List<Point> pointList);
 
-	public Point highlightMovablePoint(Point p) {
-		Point hPoint = findHighlightPoint(p);
-		/*if(hPoint != null){
-			DiagramCanvas canvas = controller.getDiagramCanvas();
-			canvas.beginPath();
-			canvas.arc(hPoint.getLeft(), hPoint.getTop(), 5, 0, Math.PI*2, false);
-			canvas.setStrokeStyle(highlightPointColor);
-			canvas.stroke();
-			canvas.setFillStyle(highlightPointColor);
-			canvas.fill();
-			canvas.closePath();
-		}*/
-		setHighlightPoint(hPoint);
-		return hPoint;
-	}
-	
-	public List<Point> getMovablePoints(){
-		return segmentPath.getPathWithoutExtremities();
-	}
+    public void draw() throws DiagramViewNotDisplayedException {
+        // Reset the segments
+        segmentSet = new HashSet<Segment>();
 
-	public void removeDecoration(){
-		decoration = null;
-	}
-	
-	public void setStraight() throws DiagramViewNotDisplayedException{
-		segmentPath.straightPath();
-	}
+        // Draw each segment
+        segmentPath.update();
+        List<Point> pointList = new ArrayList<Point>();
+        Point startPoint = segmentPath.getFirstPoint();
+        pointList.add(startPoint);
+        for (Point p : segmentPath.getPathWithoutExtremities()) {
+            Point endPoint = p;
+            // draw(startPoint, endPoint, false);
+            pointList.add(endPoint);
+            segmentSet.add(new Segment(startPoint, endPoint));
+            startPoint = endPoint;
+        }
+        // Draw last segment
+        Point lastPoint = segmentPath.getLastPoint();
+        pointList.add(lastPoint);
+        segmentSet.add(new Segment(startPoint, lastPoint));
+        // draw(startPoint, lastPoint,true);
 
-	public Shape getStartShape() {
-		return startShape;
-	}
+        // Draw All the register point
+        draw(pointList);
 
-	public Shape getEndShape() {
-		return endShape;
-	}
+        updateDecoration();
+    }
 
-	public boolean isMouseNearConnection(Point p){
-		for(Segment s : segmentSet){
-			if( !s.getP1().equals(s.getP2())
-					&& ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment){
-				return true;
-			}
-		}
-		return false;
-	}
+    private void updateDecoration() {
+        if (decoration != null) {
+            Segment decoratedSegment = segmentPath.getMiddleSegment();
+            Point decorationCenter = decoratedSegment.middle();
+            int width = decoration.getWidth();
+            int height = decoration.getHeight();
+            decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop() - height / 2, Unit.PX);
+            decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft() - width / 2, Unit.PX);
+        }
+    }
 
-	public Point getHighlightPoint() {
-		return highlightPoint;
-	}
+    public MovablePoint addMovablePoint(Point p) {
+        Point startSegmentPoint = highlightSegment.getP1();
+        Point endSegmentPoint = highlightSegment.getP2();
+        MovablePoint movablePoint = new MovablePoint(p);
+        segmentPath.add(movablePoint, startSegmentPoint, endSegmentPoint);
+        return movablePoint;
+    }
 
-	public void setHighlightPoint(Point highlightPoint) {
-		this.highlightPoint = highlightPoint;
-	}
+    private Point findHighlightPoint(Point p) {
+        for (Segment s : segmentSet) {
+            if (ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+                Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
+                highlightSegment = s;
+                highlightPoint = hPoint;
+                return highlightPoint;
+            }
+        }
+        return null;
+    }
 
-	public void setDecoration(DecorationShape decoration){
-		this.decoration = decoration;
-	}
+    public Point highlightMovablePoint(Point p) {
+        Point hPoint = findHighlightPoint(p);
+        /*
+         * if(hPoint != null){
+         * DiagramCanvas canvas = controller.getDiagramCanvas();
+         * canvas.beginPath();
+         * canvas.arc(hPoint.getLeft(), hPoint.getTop(), 5, 0, Math.PI*2, false);
+         * canvas.setStrokeStyle(highlightPointColor);
+         * canvas.stroke();
+         * canvas.setFillStyle(highlightPointColor);
+         * canvas.fill();
+         * canvas.closePath();
+         * }
+         */
+        setHighlightPoint(hPoint);
+        return hPoint;
+    }
 
-	public DecorationShape getDecoration(){
-		return decoration;
-	}
+    public List<Point> getMovablePoints() {
+        return segmentPath.getPathWithoutExtremities();
+    }
 
+    public void removeDecoration() {
+        decoration = null;
+    }
+
+    public void setStraight() {
+        segmentPath.straightPath();
+    }
+
+    public Shape getStartShape() {
+        return startShape;
+    }
+
+    public Shape getEndShape() {
+        return endShape;
+    }
+
+    public boolean isMouseNearConnection(Point p) {
+        for (Segment s : segmentSet) {
+            if (!s.getP1().equals(s.getP2()) && ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Point getHighlightPoint() {
+        return highlightPoint;
+    }
+
+    public void setHighlightPoint(Point highlightPoint) {
+        this.highlightPoint = highlightPoint;
+    }
+
+    public void setDecoration(DecorationShape decoration) {
+        this.decoration = decoration;
+    }
+
+    public DecorationShape getDecoration() {
+        return decoration;
+    }
+
+    @Override
+    public ContextMenu getContextMenu() {
+        return menu;
+    }
 
 }

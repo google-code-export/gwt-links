@@ -1,4 +1,4 @@
-package com.orange.links.test.client.widgets;
+package com.orange.links.demo.client.widgets;
 
 import com.google.gwt.dom.client.Style.FontWeight;
 import com.google.gwt.dom.client.Style.Unit;
@@ -7,8 +7,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.orange.links.test.client.GwtLinksTestEntryPoint;
-import com.orange.links.test.client.example.AbstractExample;
+import com.orange.links.demo.client.GwtLinksTestEntryPoint;
+import com.orange.links.demo.client.example.AbstractExample;
 
 public class ExampleMenuElement extends LayoutPanel{
 

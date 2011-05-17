@@ -2,13 +2,14 @@ package com.orange.links.client.connection;
 
 import java.util.List;
 
-import com.orange.links.client.DecorationShape;
-import com.orange.links.client.Shape;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.menu.HasContextMenu;
+import com.orange.links.client.shapes.DecorationShape;
+import com.orange.links.client.shapes.Shape;
 import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Point;
 
-public interface Connection {
+public interface Connection extends HasContextMenu {
 
 	/**
 	 *  Draw the connection on the global canvas

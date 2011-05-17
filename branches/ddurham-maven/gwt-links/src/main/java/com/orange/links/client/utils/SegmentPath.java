@@ -3,9 +3,9 @@ package com.orange.links.client.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.orange.links.client.PointShape;
-import com.orange.links.client.Shape;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.shapes.PointShape;
+import com.orange.links.client.shapes.Shape;
 
 public class SegmentPath {
 
@@ -79,7 +79,7 @@ public class SegmentPath {
 		return new ArrayList<Point>();
 	}
 
-	public void straightPath() throws DiagramViewNotDisplayedException{
+	public void straightPath() {
 		Segment s = ConnectionUtils.computeSegment(this.startShape,this.endShape);
 		pointList = new ArrayList<Point>();
 		if(s == null)

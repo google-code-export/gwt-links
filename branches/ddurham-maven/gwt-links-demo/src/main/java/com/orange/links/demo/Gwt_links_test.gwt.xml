@@ -12,7 +12,7 @@
 
 
 	<!-- Specify the app entry point class. -->
-	<entry-point class='com.orange.links.test.client.GwtLinksTestEntryPoint' />
+	<entry-point class='com.orange.links.demo.client.GwtLinksTestEntryPoint' />
 
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />

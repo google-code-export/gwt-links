@@ -1,8 +1,9 @@
-package com.orange.links.client;
+package com.orange.links.segment.tests;
 
 import junit.framework.TestCase;
 
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.shapes.PointShape;
 import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.SegmentPath;
 
