@@ -18,6 +18,7 @@ public class ContextMenu extends PopupPanel {
     }
     
     public MenuItem addItem(MenuItem item) {
+        item.addStyleName(LinksClientBundle.INSTANCE.css().connectionPopupItem());
         return menu.addItem(item);
     }
     

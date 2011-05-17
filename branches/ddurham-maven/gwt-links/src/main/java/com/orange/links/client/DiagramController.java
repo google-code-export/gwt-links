@@ -698,10 +698,13 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         buildConnection = c;
     }
 
+    public Point getMousePoint() {
+        return mousePoint;
+    }
+
     /*
      * Build arrow utils method
      */
-
     private Widget getWidgetUnderMouse() {
         for (Widget w : shapeMap.keySet()) {
             Rectangle r = new Rectangle(shapeMap.get(w));
