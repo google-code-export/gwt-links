@@ -1,1 +1,0 @@
-mvn install:install-file -Dfile=lib/gwt-dnd-3.0.1.jar -Dsources=lib/gwt-dnd-3.0.1.jar -DgroupId=com.allen_sauer.gwt.dnd -DartifactId=gwt-dnd -Dversion=3.0.1 -Dpackaging=jar -DgeneratePom=true -DcreateChecksum=true
