@@ -6,8 +6,8 @@ import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.menu.ContextMenu;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
-import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 
 public class StraightConnection extends AbstractConnection {

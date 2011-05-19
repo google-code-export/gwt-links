@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 
 public class ConnectionUtils {

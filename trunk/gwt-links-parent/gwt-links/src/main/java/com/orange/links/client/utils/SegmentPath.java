@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
-import com.orange.links.client.shapes.PointShape;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 
 public class SegmentPath {
@@ -33,10 +33,10 @@ public class SegmentPath {
 	public void update() throws DiagramViewNotDisplayedException{
 		if(pointList.size()>2){
 			Segment startSegment 
-				= ConnectionUtils.computeSegment(this.startShape,new PointShape(pointList.get(1)));
+				= ConnectionUtils.computeSegment(this.startShape, pointList.get(1));
 			pointList.set(0, startSegment.getP1());
 			Segment endSegment 
-				= ConnectionUtils.computeSegment(new PointShape(pointList.get(pointList.size()-2)),this.endShape);
+				= ConnectionUtils.computeSegment( pointList.get(pointList.size()-2),this.endShape);
 			pointList.set(pointList.size()-1, endSegment.getP2());
 		}
 		else{

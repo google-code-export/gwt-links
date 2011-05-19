@@ -2,7 +2,7 @@ package com.orange.links.segment.tests;
 
 import junit.framework.TestCase;
 
-import com.orange.links.client.utils.Point;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.utils.Segment;
 
 public class SegmentTest extends TestCase{

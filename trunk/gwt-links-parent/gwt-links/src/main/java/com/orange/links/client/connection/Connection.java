@@ -5,9 +5,9 @@ import java.util.List;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.menu.HasContextMenu;
 import com.orange.links.client.shapes.DecorationShape;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 import com.orange.links.client.utils.MovablePoint;
-import com.orange.links.client.utils.Point;
 
 public interface Connection extends HasContextMenu {
 

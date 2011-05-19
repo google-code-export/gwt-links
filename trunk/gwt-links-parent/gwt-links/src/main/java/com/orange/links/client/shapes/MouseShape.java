@@ -1,6 +1,5 @@
 package com.orange.links.client.shapes;
 
-import com.orange.links.client.utils.Point;
 
 
 public class MouseShape implements Shape {

@@ -1,5 +1,7 @@
 package com.orange.links.client.utils;
 
+import com.orange.links.client.shapes.Point;
+
 public class MovablePoint extends Point{
 
 	private Point point;

@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
-import com.orange.links.client.utils.Point;
 import com.orange.links.client.utils.Segment;
 
 public class StraightArrowConnection extends AbstractConnection {
