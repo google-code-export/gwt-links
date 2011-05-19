@@ -67,17 +67,19 @@ class LabelWithMenu extends BoxLabel implements HasContextMenu {
     public LabelWithMenu(String text) {
         super(text);
         customMenu = new ContextMenu();
-        customMenu.addItem(new MenuItem("Custom", new Command() {
-            @Override
-            public void execute() {
-                Window.alert("Custom");
-            }
-        }));
+        for (final String name : new String[] { "Custom 1", "Custom 2", "Custom 3" }) {
+            customMenu.addItem(new MenuItem(name, new Command() {
+                @Override
+                public void execute() {
+                    Window.alert(name + " clicked");
+                }
+            }));
+        }
     }
 
     @Override
     public ContextMenu getContextMenu() {
-        return null;
+        return customMenu;
     }
     
 }

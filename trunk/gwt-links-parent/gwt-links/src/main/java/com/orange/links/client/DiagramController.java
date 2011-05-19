@@ -76,7 +76,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      * Timer refresh duration, in milliseconds. It defers if the application is running in development mode
      * or in the web mode
      */
-    public static int refreshRate = GWT.isScript() ? 25 : 50;
+    public static int refreshRate = GWT.isScript() ? 25 : 500;
 
     private DiagramCanvas canvas;
     private DragController dragController;
@@ -87,7 +87,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     private boolean showGrid;
 
     private ContextMenu canvasMenu;
-    
+
     private Set<Connection> connectionSet;
 
     private Point mousePoint;
@@ -163,7 +163,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
                 DiagramController.this.onMouseUp(event);
             }
         }, MouseUpEvent.getType());
-        
+
         // ON MOUSE UP
         widgetPanel.addDomHandler(new MouseUpHandler() {
             @Override
@@ -171,15 +171,14 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
                 DiagramController.this.onWidgetMouseUp(event);
             }
         }, MouseUpEvent.getType());
-        
 
         timer.scheduleRepeating(refreshRate);
         frameTimer.scheduleRepeating(1000);
-        
+
         initMenu();
-        
+
         ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
-        ContextMenu.disableBrowserContextMenu(canvas.asWidget().getElement());        
+        ContextMenu.disableBrowserContextMenu(canvas.asWidget().getElement());
     }
 
     protected void initMenu() {
@@ -299,6 +298,16 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     public void addWidget(final Widget w, int left, int top) {
         w.getElement().getStyle().setZIndex(3);
         shapeMap.put(w, new FunctionShape(this, w));
+        if (w instanceof HasContextMenu) {
+            w.addDomHandler(new MouseUpHandler() {
+                @Override
+                public void onMouseUp(MouseUpEvent event) {
+                    if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
+                        showMenu((HasContextMenu) w, event.getClientX(), event.getClientY());
+                    }
+                }
+            }, MouseUpEvent.getType());
+        }
         widgetPanel.add(w, left, top);
     }
 
@@ -565,17 +574,22 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
             showMenu(c);
             return;
         }
-        
+
         showMenu(this);
     }
 
     private void showMenu(final HasContextMenu c) {
+        showMenu(c, mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
+    }
+    
+    private void showMenu(final HasContextMenu c, int left, int top) {
         ContextMenu menu = c.getContextMenu();
         if (menu != null) {
-            menu.setPopupPosition(mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
+            menu.setPopupPosition(left, top);
             menu.show();
         }
     }
+    
 
     private void onMouseMove(MouseMoveEvent event) {
         int mouseX = event.getRelativeX(canvas.getElement());
@@ -601,10 +615,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
                     }
                     return;
                 }
-            }            
+            }
         }
-    }    
-    
+    }
+
     private void onMouseUp(MouseUpEvent event) {
 
         // Test if Right Click
