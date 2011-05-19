@@ -83,15 +83,15 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     private BackgroundCanvas backgroundCanvas;
     private AbsolutePanel widgetPanel;
     private HandlerManager handlerManager;
-    private Map<Widget, FunctionShape> shapeMap;
     private boolean showGrid;
 
     private ContextMenu canvasMenu;
 
-    private Set<Connection> connectionSet;
+    private Set<Connection> connectionSet = new HashSet<Connection>();
+    private Map<Widget, FunctionShape> shapeMap = new HashMap<Widget, FunctionShape>();
 
-    private Point mousePoint;
-    private Point mouseOffsetPoint;
+    private Point mousePoint = new Point(0, 0);
+    private Point mouseOffsetPoint = new Point(0, 0);
 
     // Drag Edition status
     private boolean inEditionDragMovablePoint = false;
@@ -112,7 +112,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     long fps = 0;
 
     /**
-     * Initialize the controller diagram. Use this constructor to start your diagram. An code sample is : <br/>
+     * Initialize the controller diagram. Use this constructor to start your diagram. A code sample is : <br/>
      * <br/>
      * <code>
      * 		DiagramCanvas canvas = new MultiBrowserDiagramCanvas(400,400);<br/>
@@ -126,21 +126,21 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         this.canvas = canvas;
         this.backgroundCanvas = new BackgroundCanvas(canvas.getWidth(), canvas.getHeight());
 
-        // Init widget panel
-        widgetPanel = new AbsolutePanel();
-        widgetPanel.getElement().getStyle().setWidth(canvas.getWidth(), Unit.PX);
-        widgetPanel.getElement().getStyle().setHeight(canvas.getHeight(), Unit.PX);
-        widgetPanel.add(canvas.asWidget());
-
-        mousePoint = new Point(0, 0);
-        mouseOffsetPoint = new Point(0, 0);
-
-        connectionSet = new HashSet<Connection>();
-        shapeMap = new HashMap<Widget, FunctionShape>();
         handlerManager = new HandlerManager(canvas);
         LinksClientBundle.INSTANCE.css().ensureInjected();
 
-        // ON MOUSE MOVE
+        initWidgetPanel(canvas);
+        initMouseHandlers(canvas);
+        initMenu();
+
+        timer.scheduleRepeating(refreshRate);
+        frameTimer.scheduleRepeating(1000);
+
+        ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
+        ContextMenu.disableBrowserContextMenu(canvas.asWidget().getElement());
+    }
+
+    protected void initMouseHandlers(final DiagramCanvas canvas) {
         canvas.addDomHandler(new MouseMoveHandler() {
             @Override
             public void onMouseMove(MouseMoveEvent event) {
@@ -148,7 +148,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
             }
         }, MouseMoveEvent.getType());
 
-        // ON MOUSE DOWN
         canvas.addDomHandler(new MouseDownHandler() {
             @Override
             public void onMouseDown(MouseDownEvent event) {
@@ -156,29 +155,19 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
             }
         }, MouseDownEvent.getType());
 
-        // ON MOUSE UP
         canvas.addDomHandler(new MouseUpHandler() {
             @Override
             public void onMouseUp(MouseUpEvent event) {
                 DiagramController.this.onMouseUp(event);
             }
         }, MouseUpEvent.getType());
+    }
 
-        // ON MOUSE UP
-        widgetPanel.addDomHandler(new MouseUpHandler() {
-            @Override
-            public void onMouseUp(MouseUpEvent event) {
-                DiagramController.this.onWidgetMouseUp(event);
-            }
-        }, MouseUpEvent.getType());
-
-        timer.scheduleRepeating(refreshRate);
-        frameTimer.scheduleRepeating(1000);
-
-        initMenu();
-
-        ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
-        ContextMenu.disableBrowserContextMenu(canvas.asWidget().getElement());
+    protected void initWidgetPanel(final DiagramCanvas canvas) {
+        widgetPanel = new AbsolutePanel();
+        widgetPanel.getElement().getStyle().setWidth(canvas.getWidth(), Unit.PX);
+        widgetPanel.getElement().getStyle().setHeight(canvas.getHeight(), Unit.PX);
+        widgetPanel.add(canvas.asWidget());
     }
 
     protected void initMenu() {
@@ -601,22 +590,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         int offsetMouseY = event.getClientY();
         mouseOffsetPoint.setLeft(offsetMouseX);
         mouseOffsetPoint.setTop(offsetMouseY);
-    }
-
-    private void onWidgetMouseUp(MouseUpEvent event) {
-        // Test if Right Click
-        if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
-            event.stopPropagation();
-            event.preventDefault();
-            for (Widget w : shapeMap.keySet()) {
-                if (mousePoint.isInside(shapeMap.get(w))) {
-                    if (w instanceof HasContextMenu) {
-                        showMenu((HasContextMenu) w);
-                    }
-                    return;
-                }
-            }
-        }
     }
 
     private void onMouseUp(MouseUpEvent event) {
