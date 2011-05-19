@@ -2,6 +2,8 @@ package com.orange.links.client.utils;
 
 import java.util.Comparator;
 
+import com.orange.links.client.shapes.Point;
+
 public class PointListComparator implements Comparator<Point>{
 
 	@Override

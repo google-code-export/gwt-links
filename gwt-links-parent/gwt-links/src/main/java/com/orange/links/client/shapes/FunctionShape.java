@@ -6,7 +6,6 @@ import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.utils.Couple;
 import com.orange.links.client.utils.Direction;
-import com.orange.links.client.utils.Point;
 
 public class FunctionShape extends AbstractShape{
 

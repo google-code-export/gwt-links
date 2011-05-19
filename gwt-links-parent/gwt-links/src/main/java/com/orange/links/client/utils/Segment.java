@@ -1,5 +1,7 @@
 package com.orange.links.client.utils;
 
+import com.orange.links.client.shapes.Point;
+
 public class Segment {
 
 	private Point p1;

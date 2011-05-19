@@ -1,5 +1,6 @@
 package com.orange.links.client.utils;
 
+import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 
 public class Rectangle {
