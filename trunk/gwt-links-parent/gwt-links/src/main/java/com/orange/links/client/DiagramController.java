@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
-import com.allen_sauer.gwt.dnd.client.DragHandler;
 import com.allen_sauer.gwt.dnd.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dnd.client.DragStartEvent;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
@@ -288,12 +287,14 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
                 @Override
                 public void onDragEnd(DragEndEvent event) {
-                    shape.getConnections().setSynchronized(true);
+                    shape.setSynchronized(true);
+                    shape.getConnections().allowSynchronized(true);
                 }
-
+                
                 @Override
                 public void onDragStart(DragStartEvent event) {
-                    shape.getConnections().setSynchronized(false);
+                    shape.setSynchronized(false);
+                    shape.getConnections().allowSynchronized(false);
                 }
             });
         }
@@ -388,21 +389,19 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      */
     public void registerDragController(DragController dragController) {
         this.dragController = dragController;
-        // Register on grad controller
-        dragController.addDragHandler(new DragHandler() {
+        // Register on drag controller
+        dragController.addDragHandler(new DragHandlerAdapter() {
             @Override
             public void onPreviewDragStart(DragStartEvent event) throws VetoDragException {
                 runRefresh();
             }
-
+            
             @Override
-            public void onPreviewDragEnd(DragEndEvent event) throws VetoDragException {
-
+            public void onDragStart(DragStartEvent event) {
             }
 
             @Override
-            public void onDragStart(DragStartEvent event) {
-
+            public void onPreviewDragEnd(DragEndEvent event) throws VetoDragException {
             }
 
             @Override
@@ -522,7 +521,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
                 s.drawHighlight();
             }
             clearAnimationsOnCanvas();
-            return;
         }
 
         // Test if in Drag Movable Point
@@ -676,6 +674,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         Shape startShape = new FunctionShape(this, startFunctionWidget);
         final MouseShape endShape = new MouseShape(mousePoint);
         buildConnection = drawConnection(ConnectionFactory.ARROW, startShape, endShape);
+        buildConnection.allowSynchronized(false);
         connections.add(buildConnection);
     }
 

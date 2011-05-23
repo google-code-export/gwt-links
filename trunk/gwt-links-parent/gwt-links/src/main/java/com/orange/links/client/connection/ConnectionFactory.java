@@ -5,7 +5,7 @@ import com.orange.links.client.shapes.Shape;
 public class ConnectionFactory<C extends Connection> {
 
     public static ConnectionFactory<StraightConnection> STRAIGHT = new ConnectionFactory<StraightConnection>(ConnectionType.PLAIN);
-    public static ConnectionFactory<StraightConnection> ARROW = new ConnectionFactory<StraightConnection>(ConnectionType.SINGLE_ARROW);
+    public static ConnectionFactory<StraightArrowConnection> ARROW = new ConnectionFactory<StraightArrowConnection>(ConnectionType.SINGLE_ARROW);
     
     public static enum ConnectionType { PLAIN, SINGLE_ARROW }
     

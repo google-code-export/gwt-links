@@ -113,12 +113,12 @@ public class Point implements Shape {
 
     @Override
     public boolean addConnection(Connection connection) {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override
     public boolean removeConnection(Connection connection) {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override
@@ -128,6 +128,10 @@ public class Point implements Shape {
     @Override
     public boolean isSynchronized() {
         return true;
+    }
+
+    @Override
+    public void allowSynchronized(boolean allowSynchronized) {
     }
 
     @Override

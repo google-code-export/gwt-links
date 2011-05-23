@@ -15,7 +15,6 @@ import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.menu.ContextMenu;
-import com.orange.links.client.menu.HasContextMenu;
 import com.orange.links.client.shapes.DecorationShape;
 import com.orange.links.client.shapes.FunctionShape;
 import com.orange.links.client.shapes.Point;
@@ -44,6 +43,7 @@ public abstract class AbstractConnection implements Connection {
 
     protected ContextMenu menu;
     private boolean sync;
+    private boolean allowSync;
 
     public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
         this(startShape, endShape);
@@ -67,10 +67,15 @@ public abstract class AbstractConnection implements Connection {
         menu.addItem(new MenuItem("Delete", true, new Command() {
             public void execute() {
                 // fireEvent
-                Widget startWidget = ((FunctionShape) getStartShape()).asWidget();
-                Widget endWidget = ((FunctionShape) getEndShape()).asWidget();
+                FunctionShape startShape = (FunctionShape) getStartShape();
+                FunctionShape endShape = (FunctionShape) getEndShape();
+
+                Widget startWidget = startShape.asWidget();
+                Widget endWidget = endShape.asWidget();
                 controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
                 controller.deleteConnection(AbstractConnection.this);
+                startShape.removeConnection(AbstractConnection.this);
+                endShape.removeConnection(AbstractConnection.this);
                 menu.hide();
             }
         }));
@@ -92,7 +97,9 @@ public abstract class AbstractConnection implements Connection {
     }
 
     public void setSynchronized(boolean sync) {
-        this.sync = sync;
+        if (allowSync) {
+            this.sync = sync;
+        }
     }
 
     public void draw() {
@@ -121,6 +128,7 @@ public abstract class AbstractConnection implements Connection {
         draw(pointList);
 
         updateDecoration();
+        setSynchronized(true);
     }
 
     private void updateDecoration() {
@@ -231,4 +239,11 @@ public abstract class AbstractConnection implements Connection {
     public void drawHighlight() {
     }
 
+    @Override
+    public void allowSynchronized(boolean allowSynchronized) {
+        this.allowSync = allowSynchronized;
+    }
+
+    
+    
 }

@@ -20,22 +20,18 @@ public class Example1 extends AbstractExample{
 		Widget labelHello = new BoxLabel("Hello");
 		controller.addWidget(labelHello,25,115);
 		
-		Widget labelWorld = new BoxLabel("World");
-		controller.addWidget(labelWorld,200,115);
-		
-		LabelWithMenu hasMenu = new LabelWithMenu("Has Custom Menu");
-        controller.addWidget(hasMenu, 150, 200);
+        LabelWithMenu hasMenu = new LabelWithMenu("Context Menu");
+		controller.addWidget(hasMenu,200,115);
 		
 		// Add DnD logic
 		PickupDragController dragController = new PickupDragController(controller.getView(), true);
 		dragController.makeDraggable(labelHello);
-		dragController.makeDraggable(labelWorld);
         dragController.makeDraggable(hasMenu);
         
 		//controller.registerDragController(dragController);
 		
 		// Add the logic
-		Connection con = controller.drawStraightArrowConnection(labelHello, labelWorld);
+		Connection con = controller.drawStraightArrowConnection(labelHello, hasMenu);
 		con.getContextMenu().addItem(new MenuItem("Hello World !", new Command() {
 			@Override
 			public void execute() {

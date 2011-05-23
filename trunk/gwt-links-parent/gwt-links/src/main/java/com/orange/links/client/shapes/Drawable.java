@@ -26,4 +26,12 @@ public interface Drawable {
      */
     void drawHighlight();
     
+    /**
+     * Whether or not a Drawable can be set as Synchronized per setSynchronized.  E.g., a Connection sets itself as 
+     * synced after draw.  If it is connected to shape being dragged, we don't want to allow it to sync itself.
+     * 
+     * @param allowSynchronized whether or not the Drawable should allow itself to be set as synchronized.
+     */
+    void allowSynchronized(boolean allowSynchronized);
+    
 }
