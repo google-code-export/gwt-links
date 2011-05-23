@@ -31,6 +31,7 @@ public class Example1 extends AbstractExample{
 		dragController.makeDraggable(labelHello);
 		dragController.makeDraggable(labelWorld);
         dragController.makeDraggable(hasMenu);
+        
 		//controller.registerDragController(dragController);
 		
 		// Add the logic

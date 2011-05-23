@@ -13,6 +13,10 @@ public class StraightArrowConnection extends AbstractConnection {
 	private int arrowLength = 8;
 	private int cubicMargin = 25;
 	private double arrowAngle = Math.PI/8;
+
+    public StraightArrowConnection(Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
+        super(startShape, endShape);
+    }
 	
 	public StraightArrowConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
 		super(controller, startShape, endShape);

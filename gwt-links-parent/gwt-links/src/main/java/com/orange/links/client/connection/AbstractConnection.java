@@ -43,20 +43,23 @@ public abstract class AbstractConnection implements Connection {
     protected SegmentPath segmentPath;
 
     protected ContextMenu menu;
+    private boolean sync;
 
     public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
-        this.controller = controller;
+        this(startShape, endShape);
+        setController(controller);
+    }
+
+    public AbstractConnection(Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
         this.startShape = startShape;
         this.endShape = endShape;
         this.segmentSet = new HashSet<Segment>();
-        this.canvas = controller.getDiagramCanvas();
 
         // Build Path
         this.segmentPath = new SegmentPath(startShape, endShape);
         highlightSegment = this.segmentPath.asStraightPath();
 
         initMenu();
-
     }
 
     protected void initMenu() {
@@ -84,7 +87,15 @@ public abstract class AbstractConnection implements Connection {
 
     protected abstract void draw(List<Point> pointList);
 
-    public void draw() throws DiagramViewNotDisplayedException {
+    public boolean isSynchronized() {
+        return sync;
+    }
+
+    public void setSynchronized(boolean sync) {
+        this.sync = sync;
+    }
+
+    public void draw() {
         // Reset the segments
         segmentSet = new HashSet<Segment>();
 
@@ -209,6 +220,15 @@ public abstract class AbstractConnection implements Connection {
     @Override
     public ContextMenu getContextMenu() {
         return menu;
+    }
+
+    public void setController(DiagramController controller) {
+        this.controller = controller;
+        this.canvas = controller.getDiagramCanvas();
+    }
+
+    @Override
+    public void drawHighlight() {
     }
 
 }

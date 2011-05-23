@@ -79,7 +79,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 				updateEditionPanel(editionPanel);
 			}
 		};
-		timer.scheduleRepeating(25);
+//		timer.scheduleRepeating(500);
 		editionPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		editionPanel.getElement().getStyle().setPadding(10, Unit.PX);
 		editionPanel.getElement().getStyle().setMargin(10, Unit.PX);
@@ -116,7 +116,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	private void updateEditionPanel(VerticalPanel panel){
 		panel.clear();
 		panel.add(new Label("FPS : " + currentController.getFps()));
-		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
+//		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
 		// InDragBuildArrow
 		if(currentController.isInDragBuildArrow()){
 			Label dragBuildLabel = new Label("Active : inDragBuildArrow");
@@ -181,6 +181,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		globalPanel.insert(w, index);
 		
+//		currentController.addWidget(new Label("test"), 25, 25);
 		example.draw(currentController);
 		
 	}

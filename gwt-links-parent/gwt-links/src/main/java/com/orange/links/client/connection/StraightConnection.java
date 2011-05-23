@@ -14,6 +14,10 @@ public class StraightConnection extends AbstractConnection {
 
     private int cubicMargin = 25;
 
+    public StraightConnection(Shape startShape, Shape endShape) {
+        super(startShape, endShape);
+    }
+
     public StraightConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
         super(controller, startShape, endShape);
     }

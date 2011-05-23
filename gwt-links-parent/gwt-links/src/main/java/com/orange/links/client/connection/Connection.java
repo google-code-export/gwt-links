@@ -2,20 +2,16 @@ package com.orange.links.client.connection;
 
 import java.util.List;
 
-import com.orange.links.client.exception.DiagramViewNotDisplayedException;
+import com.orange.links.client.DiagramController;
 import com.orange.links.client.menu.HasContextMenu;
 import com.orange.links.client.shapes.DecorationShape;
+import com.orange.links.client.shapes.Drawable;
 import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 import com.orange.links.client.utils.MovablePoint;
 
-public interface Connection extends HasContextMenu {
+public interface Connection extends Drawable, HasContextMenu {
 
-	/**
-	 *  Draw the connection on the global canvas
-	 */
-	void draw() throws DiagramViewNotDisplayedException;
-	
 	/**
 	 * Add a fixed point on a connection called movable point
 	 * @param p the point 
@@ -49,7 +45,7 @@ public interface Connection extends HasContextMenu {
 	/**
 	 * Delete alle the movable point and then, the connection is straight
 	 */
-	void setStraight() throws DiagramViewNotDisplayedException;
+	void setStraight();
 	
 	/**
 	 *  Return the start container
@@ -76,5 +72,7 @@ public interface Connection extends HasContextMenu {
 	 * @return true is the mouse is near the connection
 	 */
 	boolean isMouseNearConnection(Point mousePoint);
+	
+	void setController(DiagramController controller);
 
 }
