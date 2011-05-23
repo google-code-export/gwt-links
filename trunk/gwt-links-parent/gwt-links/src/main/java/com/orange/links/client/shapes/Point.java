@@ -1,9 +1,11 @@
 package com.orange.links.client.shapes;
 
+import com.orange.links.client.connection.Connection;
 import com.orange.links.client.utils.Direction;
 import com.orange.links.client.utils.Rectangle;
 
 public class Point implements Shape {
+
     protected int left;
     protected int top;
     private Direction direction;
@@ -33,7 +35,7 @@ public class Point implements Shape {
     public int getTop() {
         return top;
     }
-    
+
     public int getWidth() {
         return 1;
     }
@@ -107,6 +109,33 @@ public class Point implements Shape {
     @Override
     public String toString() {
         return "[ " + left + " ; " + top + " ]";
+    }
+
+    @Override
+    public boolean addConnection(Connection connection) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean removeConnection(Connection connection) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSynchronized(boolean sync) {
+    }
+
+    @Override
+    public boolean isSynchronized() {
+        return true;
+    }
+
+    @Override
+    public void draw() {
+    }
+
+    @Override
+    public void drawHighlight() {
     }
 
 }

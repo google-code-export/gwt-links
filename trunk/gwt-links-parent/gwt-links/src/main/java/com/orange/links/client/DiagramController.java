@@ -1,14 +1,11 @@
 package com.orange.links.client;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.DragHandler;
+import com.allen_sauer.gwt.dnd.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dnd.client.DragStartEvent;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.google.gwt.core.client.GWT;
@@ -35,8 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.connection.Connection;
-import com.orange.links.client.connection.StraightArrowConnection;
-import com.orange.links.client.connection.StraightConnection;
+import com.orange.links.client.connection.ConnectionFactory;
 import com.orange.links.client.event.ChangeOnDiagramEvent;
 import com.orange.links.client.event.ChangeOnDiagramEvent.HasChangeOnDiagramHandlers;
 import com.orange.links.client.event.ChangeOnDiagramHandler;
@@ -46,22 +42,22 @@ import com.orange.links.client.event.TieLinkHandler;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkEvent.HasUntieLinkHandlers;
 import com.orange.links.client.event.UntieLinkHandler;
-import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.menu.ContextMenu;
 import com.orange.links.client.menu.HasContextMenu;
 import com.orange.links.client.shapes.DecorationShape;
+import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.client.shapes.FunctionShape;
 import com.orange.links.client.shapes.MouseShape;
 import com.orange.links.client.shapes.Point;
 import com.orange.links.client.shapes.Shape;
 import com.orange.links.client.utils.LinksClientBundle;
 import com.orange.links.client.utils.MovablePoint;
-import com.orange.links.client.utils.Rectangle;
 
 /**
  * Controller which manage all the diagram logic
  * 
  * @author Pierre Renaudin (pierre.renaudin.fr@gmail.com)
+ * @author David Durham (david.durham.jr@gmail.com)
  * 
  */
 public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandlers, HasChangeOnDiagramHandlers, HasContextMenu {
@@ -87,8 +83,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
     private ContextMenu canvasMenu;
 
-    private Set<Connection> connectionSet = new HashSet<Connection>();
-    private Map<Widget, FunctionShape> shapeMap = new HashMap<Widget, FunctionShape>();
+    private DrawableSet<Connection> connections = new DrawableSet<Connection>();
+    private DrawableSet<FunctionShape> shapes = new DrawableSet<FunctionShape>();
+
+    // private Map<Widget, FunctionShape> shapeMap = new HashMap<Widget, FunctionShape>();
 
     private Point mousePoint = new Point(0, 0);
     private Point mouseOffsetPoint = new Point(0, 0);
@@ -175,7 +173,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         canvasMenu.addItem(new MenuItem("About", new Command() {
             @Override
             public void execute() {
-                Window.alert("About GWT-Links..");
+                Window.alert("http://gwt-links.googlecode.com/");
             }
         }));
     }
@@ -197,8 +195,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      * Clear the diagram (connections and widgets)
      */
     public void clearDiagram() {
-        connectionSet.clear();
-        shapeMap.clear();
+        connections.clear();
+        // shapeMap.clear();
+        shapes.clear();
         startFunctionWidget = null;
         buildConnection = null;
 
@@ -220,25 +219,30 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      * @return the created new connection between the two widgets
      */
     public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget) {
-        // Build Shape for the Widgets
-        if (!shapeMap.containsKey(startWidget)) {
-            shapeMap.put(startWidget, new FunctionShape(this, startWidget));
-        }
-        Shape startShape = shapeMap.get(startWidget);
-        if (!shapeMap.containsKey(endWidget)) {
-            shapeMap.put(endWidget, new FunctionShape(this, endWidget));
-        }
-        Shape endShape = shapeMap.get(endWidget);
-        // Create Connection and Store it in the controller
-        Connection c;
-        try {
-            c = new StraightArrowConnection(this, startShape, endShape);
-        } catch (DiagramViewNotDisplayedException e) {
-            e.printStackTrace();
-            return null;
+        return drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
+    }
+
+    private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Widget start, Widget end) {
+        FunctionShape startShape = new FunctionShape(this, start);
+        if (!shapes.contains(startShape)) {
+            shapes.add(startShape);
         }
 
-        connectionSet.add(c);
+        FunctionShape endShape = new FunctionShape(this, end);
+        if (!shapes.contains(endShape)) {
+            shapes.add(endShape);
+        }
+        
+        return drawConnection(cf, startShape, endShape);
+    }
+
+    private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Shape start, Shape end) {
+        // Create Connection and Store it in the controller
+        C c = cf.create(start, end);
+        c.setController(this);
+        connections.add(c);
+        start.addConnection(c);
+        end.addConnection(c);
         return c;
     }
 
@@ -252,26 +256,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      * @return the created new connection between the two widgets
      */
     public Connection drawStraightConnection(Widget startWidget, Widget endWidget) {
-        // Build Shape for the Widgets
-        if (!shapeMap.containsKey(startWidget)) {
-            shapeMap.put(startWidget, new FunctionShape(this, startWidget));
-        }
-        Shape startShape = shapeMap.get(startWidget);
-        if (!shapeMap.containsKey(endWidget)) {
-            shapeMap.put(endWidget, new FunctionShape(this, endWidget));
-        }
-        Shape endShape = shapeMap.get(endWidget);
-        // Create Connection and Store it in the controller
-        Connection c;
-        try {
-            c = new StraightConnection(this, startShape, endShape);
-        } catch (DiagramViewNotDisplayedException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        connectionSet.add(c);
-        return c;
+        return drawConnection(ConnectionFactory.STRAIGHT, startWidget, endWidget);
     }
 
     /**
@@ -286,7 +271,8 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      */
     public void addWidget(final Widget w, int left, int top) {
         w.getElement().getStyle().setZIndex(3);
-        shapeMap.put(w, new FunctionShape(this, w));
+        final FunctionShape shape = new FunctionShape(this, w);
+        shapes.add(shape);
         if (w instanceof HasContextMenu) {
             w.addDomHandler(new MouseUpHandler() {
                 @Override
@@ -297,7 +283,25 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
                 }
             }, MouseUpEvent.getType());
         }
+        if (dragController != null) {
+            dragController.addDragHandler(new DragHandlerAdapter() {
+
+                @Override
+                public void onDragEnd(DragEndEvent event) {
+                    shape.getConnections().setSynchronized(true);
+                }
+
+                @Override
+                public void onDragStart(DragStartEvent event) {
+                    shape.getConnections().setSynchronized(false);
+                }
+            });
+        }
         widgetPanel.add(w, left, top);
+    }
+
+    public void addWidgetAtMousePoint(final Widget w) {
+        addWidget(w, mousePoint.getLeft(), mousePoint.getTop());
     }
 
     /**
@@ -496,49 +500,35 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     }
 
     private void update() {
-        // Restore canvas
-        canvas.clear();
-
-        // Redraw Connections
-        for (Connection c : connectionSet) {
-            try {
-                c.draw();
-            } catch (DiagramViewNotDisplayedException e) {
-                e.printStackTrace();
-                pauseRefresh();
-                break;
-            }
-        }
+        redrawConnections();
 
         // Search for selectable area
         if (!inDragBuildArrow) {
-            for (Widget w : shapeMap.keySet()) {
-                FunctionShape s = shapeMap.get(w);
+            for (FunctionShape s : shapes) {
                 if (s.isMouseNearSelectableArea(mousePoint)) {
                     s.highlightSelectableArea(mousePoint);
                     inEditionSelectableShapeToDrawConnection = true;
-                    startFunctionWidget = w;
+                    startFunctionWidget = s.asWidget();
                     RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
                     return;
                 }
                 inEditionSelectableShapeToDrawConnection = false;
             }
-        }
-
-        // Don't go deeper if in edition mode
-        if (inDragBuildArrow) {
+        } else {
+            // Don't go deeper if in edition mode
             // If mouse over a widget, highlight it
-            Widget w = getWidgetUnderMouse();
-            if (w != null) {
-                highlightWidget(w);
+            FunctionShape s = getShapeUnderMouse();
+            if (s != null) {
+                s.drawHighlight();
             }
             clearAnimationsOnCanvas();
             return;
         }
 
         // Test if in Drag Movable Point
+
         if (!inDragMovablePoint && !inDragBuildArrow) {
-            for (Connection c : connectionSet) {
+            for (Connection c : connections) {
                 if (c.isMouseNearConnection(mousePoint)) {
                     highlightPoint = c.highlightMovablePoint(mousePoint);
                     highlightConnection = getConnectionNearMouse();
@@ -551,6 +541,16 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         }
 
         clearAnimationsOnCanvas();
+    }
+
+    /**
+     * If any connections need to be redrawn, clear the canvas and redraw all lines.
+     */
+    protected void redrawConnections() {
+        if (!connections.isSynchronized()) {
+            canvas.clear();
+            connections.draw();
+        }
     }
 
     private void clearAnimationsOnCanvas() {
@@ -570,7 +570,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
     private void showMenu(final HasContextMenu c) {
         showMenu(c, mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
     }
-    
+
     private void showMenu(final HasContextMenu c, int left, int top) {
         ContextMenu menu = c.getContextMenu();
         if (menu != null) {
@@ -578,7 +578,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
             menu.show();
         }
     }
-    
 
     private void onMouseMove(MouseMoveEvent event) {
         int mouseX = event.getRelativeX(canvas.getElement());
@@ -609,17 +608,19 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         }
 
         if (inDragBuildArrow) {
-            Widget widgetSelected = getWidgetUnderMouse();
+            Widget widgetSelected = getShapeUnderMouse().asWidget();
             if (widgetSelected != null && startFunctionWidget != widgetSelected) {
                 Connection c = drawStraightArrowConnection(startFunctionWidget, widgetSelected);
                 fireEvent(new TieLinkEvent(startFunctionWidget, widgetSelected, c));
             }
             canvas.setBackground();
-            connectionSet.remove(buildConnection);
+            connections.remove(buildConnection);
             inDragBuildArrow = false;
             buildConnection = null;
-            for (Widget w : shapeMap.keySet()) {
-                removeHighlightWidget(w);
+            for (FunctionShape s : shapes) {
+                if (!s.isSynchronized()) {
+                    s.draw();
+                }
             }
             clearAnimationsOnCanvas();
         }
@@ -657,12 +658,12 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
      */
 
     public void deleteConnection(Connection c) {
-        connectionSet.remove(c);
+        connections.remove(c);
         removeDecoration(c);
     }
 
     private Connection getConnectionNearMouse() {
-        for (Connection c : connectionSet) {
+        for (Connection c : connections) {
             if (c.isMouseNearConnection(mousePoint)) {
                 return c;
             }
@@ -674,40 +675,21 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
         canvas.setForeground();
         Shape startShape = new FunctionShape(this, startFunctionWidget);
         final MouseShape endShape = new MouseShape(mousePoint);
-        Connection c;
-        try {
-            c = new StraightArrowConnection(this, startShape, endShape);
-        } catch (DiagramViewNotDisplayedException e) {
-            e.printStackTrace();
-            return;
-        }
-        connectionSet.add(c);
-        buildConnection = c;
+        buildConnection = drawConnection(ConnectionFactory.ARROW, startShape, endShape);
+        connections.add(buildConnection);
     }
 
     public Point getMousePoint() {
         return mousePoint;
     }
 
-    /*
-     * Build arrow utils method
-     */
-    private Widget getWidgetUnderMouse() {
-        for (Widget w : shapeMap.keySet()) {
-            Rectangle r = new Rectangle(shapeMap.get(w));
-            removeHighlightWidget(w);
-            if (r.isInside(mousePoint)) {
-                return w;
+    private FunctionShape getShapeUnderMouse() {
+        for (FunctionShape s : shapes) {
+            if (mousePoint.isInside(s)) {
+                return s;
             }
         }
         return null;
     }
 
-    private void highlightWidget(Widget w) {
-        w.addStyleName(LinksClientBundle.INSTANCE.css().translucide());
-    }
-
-    private void removeHighlightWidget(Widget w) {
-        w.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
-    }
 }
