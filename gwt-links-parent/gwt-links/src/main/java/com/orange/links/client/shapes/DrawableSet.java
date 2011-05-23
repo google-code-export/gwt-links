@@ -55,6 +55,12 @@ public class DrawableSet<D extends Drawable> extends HashSet<D> implements Drawa
             drawable.drawHighlight();
         }
     }
-    
+
+    @Override
+    public void allowSynchronized(boolean allowSynchronized) {
+        for (Drawable drawable : this) {
+            drawable.allowSynchronized(allowSynchronized);
+        }
+    }
 
 }

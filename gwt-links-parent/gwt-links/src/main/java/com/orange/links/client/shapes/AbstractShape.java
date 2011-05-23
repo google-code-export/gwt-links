@@ -1,8 +1,5 @@
 package com.orange.links.client.shapes;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,6 +16,7 @@ public abstract class AbstractShape implements Shape {
     private int offsetWidth = -1;
     private int offsetHeight = -1;
     private boolean sync;
+    protected boolean allowSync;
 
     private DrawableSet<Connection> connections = new DrawableSet<Connection>();
 
@@ -123,5 +121,12 @@ public abstract class AbstractShape implements Shape {
     public DrawableSet<Connection> getConnections() {
         return connections;
     }
+
+    @Override
+    public void allowSynchronized(boolean allowSynchronized) {
+        this.allowSync = allowSynchronized;
+    }
+    
+    
 
 }
