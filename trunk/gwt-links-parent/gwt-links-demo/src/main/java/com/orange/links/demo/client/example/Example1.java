@@ -3,14 +3,11 @@ package com.orange.links.demo.client.example;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
-import com.orange.links.client.menu.ContextMenu;
-import com.orange.links.client.menu.HasContextMenu;
-import com.orange.links.demo.client.widgets.BoxLabel;
+import com.orange.links.demo.client.widgets.*;
 
 public class Example1 extends AbstractExample{
 
@@ -57,26 +54,4 @@ public class Example1 extends AbstractExample{
 
 }
 
-class LabelWithMenu extends BoxLabel implements HasContextMenu {
-    
-    ContextMenu customMenu;
-    
-    public LabelWithMenu(String text) {
-        super(text);
-        customMenu = new ContextMenu();
-        for (final String name : new String[] { "Custom 1", "Custom 2", "Custom 3" }) {
-            customMenu.addItem(new MenuItem(name, new Command() {
-                @Override
-                public void execute() {
-                    Window.alert(name + " clicked");
-                }
-            }));
-        }
-    }
 
-    @Override
-    public ContextMenu getContextMenu() {
-        return customMenu;
-    }
-    
-}
