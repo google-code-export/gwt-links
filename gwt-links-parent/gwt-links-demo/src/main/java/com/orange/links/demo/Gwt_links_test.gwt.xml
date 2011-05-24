@@ -7,7 +7,6 @@
 	<!-- Other module inherits -->
 	<inherits name='com.orange.links.Links' />
 	<inherits name='com.allen_sauer.gwt.dnd.gwt-dnd' />
-	<inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
 
 	<set-property name="compiler.emulatedStack" value="true" />
 	<set-configuration-property name="compiler.emulatedStack.recordLineNumbers"

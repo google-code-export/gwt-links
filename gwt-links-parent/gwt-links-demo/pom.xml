@@ -43,13 +43,6 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-         <dependency>
-            <groupId>com.allen_sauer.gwt.log</groupId>
-            <artifactId>gwt-log</artifactId>
-            <version>${gwt-log.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
