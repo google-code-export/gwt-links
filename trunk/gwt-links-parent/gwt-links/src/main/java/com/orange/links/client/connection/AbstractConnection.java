@@ -42,6 +42,9 @@ public abstract class AbstractConnection implements Connection {
     protected SegmentPath segmentPath;
 
     protected ContextMenu menu;
+    protected static String deleteMenuText = "Delete";
+    protected static String straightenMenuText = "Straighten";
+    
     private boolean sync;
     private boolean allowSync;
 
@@ -64,7 +67,7 @@ public abstract class AbstractConnection implements Connection {
 
     protected void initMenu() {
         menu = new ContextMenu();
-        menu.addItem(new MenuItem("Delete", true, new Command() {
+        menu.addItem(new MenuItem(deleteMenuText, true, new Command() {
             public void execute() {
                 // fireEvent
                 FunctionShape startShape = (FunctionShape) getStartShape();
@@ -80,7 +83,7 @@ public abstract class AbstractConnection implements Connection {
             }
         }));
 
-        menu.addItem(new MenuItem("Straighten", true, new Command() {
+        menu.addItem(new MenuItem(straightenMenuText, true, new Command() {
             public void execute() {
                 setStraight();
                 menu.hide();
@@ -229,7 +232,14 @@ public abstract class AbstractConnection implements Connection {
     public ContextMenu getContextMenu() {
         return menu;
     }
+    
+    public static void setStraightenText(String text){
+    	straightenMenuText = text;
+    }
 
+    public static void setDeleteText(String text){
+    	deleteMenuText = text;
+    }
     public void setController(DiagramController controller) {
         this.controller = controller;
         this.canvas = controller.getDiagramCanvas();
@@ -243,7 +253,5 @@ public abstract class AbstractConnection implements Connection {
     public void allowSynchronized(boolean allowSynchronized) {
         this.allowSync = allowSynchronized;
     }
-
-    
     
 }
