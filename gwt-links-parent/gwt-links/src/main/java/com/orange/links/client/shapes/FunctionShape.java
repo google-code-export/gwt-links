@@ -10,8 +10,8 @@ import com.orange.links.client.utils.LinksClientBundle;
 
 public class FunctionShape extends AbstractShape {
 
-    private int selectableAreaRadius = 7;
-    private CssColor highlightSelectableAreaColor = CssColor.make("#FF6600");
+	private int selectableAreaRadius = 8;
+	private CssColor highlightSelectableAreaColor = CssColor.make("#DDDDDD");
 
     public FunctionShape(DiagramController controller, Widget widget) {
         super(controller, widget);
@@ -30,7 +30,7 @@ public class FunctionShape extends AbstractShape {
             DiagramCanvas canvas = controller.getDiagramCanvas();
             canvas.beginPath();
             canvas.arc(closestSelectablePoint.getLeft(), closestSelectablePoint.getTop(), selectableAreaRadius, direction.getAngle()
-                    - Math.PI / 2, direction.getAngle() + Math.PI / 2, direction.equals(Direction.N) || direction.equals(Direction.S));
+                    - Math.PI / 2, direction.getAngle() + Math.PI / 2, true);
             canvas.setStrokeStyle(highlightSelectableAreaColor);
             canvas.stroke();
             canvas.setFillStyle(highlightSelectableAreaColor);
