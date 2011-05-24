@@ -14,9 +14,6 @@ public class StraightArrowConnection extends AbstractConnection {
 	private int cubicMargin = 25;
 	private double arrowAngle = Math.PI/8;
 
-    public StraightArrowConnection(Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
-        super(startShape, endShape);
-    }
 	
 	public StraightArrowConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException{
 		super(controller, startShape, endShape);
@@ -25,6 +22,8 @@ public class StraightArrowConnection extends AbstractConnection {
 	@Override
 	public void draw(Point p1, Point p2, boolean lastPoint){
 
+		canvas.clear();
+		
 		canvas.beginPath();
 		canvas.moveTo(p1.getLeft(),p1.getTop());
 		canvas.lineTo(p2.getLeft(), p2.getTop());
@@ -61,6 +60,8 @@ public class StraightArrowConnection extends AbstractConnection {
 		Point p0 = pointList.get(0);
 		Point p1 = pointList.get(1);
 		Point p2;
+		
+		canvas.clear();
 		
 		canvas.beginPath();
 		canvas.moveTo(p0.getLeft(),p0.getTop());

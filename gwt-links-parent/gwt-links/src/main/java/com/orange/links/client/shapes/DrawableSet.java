@@ -62,5 +62,16 @@ public class DrawableSet<D extends Drawable> extends HashSet<D> implements Drawa
             drawable.allowSynchronized(allowSynchronized);
         }
     }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public DrawableSet<D> getUnsynchronizedDrawables(){
+		DrawableSet unsynchronizedSet = new DrawableSet<Drawable>();
+    	for (Drawable drawable : this) {
+            if(!drawable.isSynchronized())
+            	unsynchronizedSet.add(drawable);
+        }
+    	return unsynchronizedSet;
+    }
+    
 
 }

@@ -18,6 +18,7 @@
         <gwt.version>2.2.0</gwt.version>
         <gwt-incubator.version>2.0.1</gwt-incubator.version>
         <gwt-dnd.version>3.0.1</gwt-dnd.version>
+        <gwt-log.version>3.1.2</gwt-log.version>
     </properties>
 
 

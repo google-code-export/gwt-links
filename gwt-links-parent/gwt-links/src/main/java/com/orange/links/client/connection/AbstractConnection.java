@@ -11,7 +11,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
-import com.orange.links.client.canvas.DiagramCanvas;
+import com.orange.links.client.canvas.ConnectionCanvas;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.exception.DiagramViewNotDisplayedException;
 import com.orange.links.client.menu.ContextMenu;
@@ -26,232 +26,222 @@ import com.orange.links.client.utils.SegmentPath;
 
 public abstract class AbstractConnection implements Connection {
 
-    protected Shape startShape;
-    protected Shape endShape;
-    protected Set<Segment> segmentSet;
-    protected DiagramController controller;
-    protected DiagramCanvas canvas;
-    protected DecorationShape decoration;
+	protected Shape startShape;
+	protected Shape endShape;
+	protected Set<Segment> segmentSet;
+	protected DiagramController controller;
+	protected ConnectionCanvas canvas;
+	protected DecorationShape decoration;
 
-    public static CssColor defaultConnectionColor = CssColor.make("#000000");
-    protected CssColor connectionColor = defaultConnectionColor;
-    protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
+	public static CssColor defaultConnectionColor = CssColor.make("#000000");
+	protected CssColor connectionColor = defaultConnectionColor;
+	protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
 
-    protected Point highlightPoint;
-    protected Segment highlightSegment;
-    protected SegmentPath segmentPath;
+	protected Point highlightPoint;
+	protected Segment highlightSegment;
+	protected SegmentPath segmentPath;
 
-    protected ContextMenu menu;
-    protected static String deleteMenuText = "Delete";
-    protected static String straightenMenuText = "Straighten";
-    
-    private boolean sync;
-    private boolean allowSync;
+	protected ContextMenu menu;
+	protected static String deleteMenuText = "Delete";
+	protected static String straightenMenuText = "Straighten";
 
-    public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
-        this(startShape, endShape);
-        setController(controller);
-    }
+	private boolean sync;
+	private boolean allowSync;
 
-    public AbstractConnection(Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
-        this.startShape = startShape;
-        this.endShape = endShape;
-        this.segmentSet = new HashSet<Segment>();
+	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
+		this.startShape = startShape;
+		this.endShape = endShape;
+		this.segmentSet = new HashSet<Segment>();
 
-        // Build Path
-        this.segmentPath = new SegmentPath(startShape, endShape);
-        highlightSegment = this.segmentPath.asStraightPath();
+		// Build Path
+		this.segmentPath = new SegmentPath(startShape, endShape);
+		highlightSegment = this.segmentPath.asStraightPath();
 
-        initMenu();
-    }
+		initMenu();
 
-    protected void initMenu() {
-        menu = new ContextMenu();
-        menu.addItem(new MenuItem(deleteMenuText, true, new Command() {
-            public void execute() {
-                // fireEvent
-                FunctionShape startShape = (FunctionShape) getStartShape();
-                FunctionShape endShape = (FunctionShape) getEndShape();
+		setController(controller);
+		canvas = new ConnectionCanvas(controller.getCanvasWidth(), controller.getCanvasHeight());
+		controller.getView().add(canvas.asWidget());
+	}
 
-                Widget startWidget = startShape.asWidget();
-                Widget endWidget = endShape.asWidget();
-                controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
-                controller.deleteConnection(AbstractConnection.this);
-                startShape.removeConnection(AbstractConnection.this);
-                endShape.removeConnection(AbstractConnection.this);
-                menu.hide();
-            }
-        }));
 
-        menu.addItem(new MenuItem(straightenMenuText, true, new Command() {
-            public void execute() {
-                setStraight();
-                menu.hide();
-            }
-        }));
-    }
+	protected void initMenu() {
+		menu = new ContextMenu();
+		menu.addItem(new MenuItem(deleteMenuText, true, new Command() {
+			public void execute() {
+				// fireEvent
+				FunctionShape startShape = (FunctionShape) getStartShape();
+				FunctionShape endShape = (FunctionShape) getEndShape();
 
-    protected abstract void draw(Point p1, Point p2, boolean lastPoint);
+				Widget startWidget = startShape.asWidget();
+				Widget endWidget = endShape.asWidget();
+				controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
+				controller.deleteConnection(AbstractConnection.this);
+				startShape.removeConnection(AbstractConnection.this);
+				endShape.removeConnection(AbstractConnection.this);
+				menu.hide();
+			}
+		}));
 
-    protected abstract void draw(List<Point> pointList);
+		menu.addItem(new MenuItem(straightenMenuText, true, new Command() {
+			public void execute() {
+				setStraight();
+				menu.hide();
+			}
+		}));
+	}
 
-    public boolean isSynchronized() {
-        return sync;
-    }
+	protected abstract void draw(Point p1, Point p2, boolean lastPoint);
 
-    public void setSynchronized(boolean sync) {
-        if (allowSync) {
-            this.sync = sync;
-        }
-    }
+	protected abstract void draw(List<Point> pointList);
 
-    public void draw() {
-        // Reset the segments
-        segmentSet = new HashSet<Segment>();
+	public boolean isSynchronized() {
+		return sync;
+	}
 
-        // Draw each segment
-        segmentPath.update();
-        List<Point> pointList = new ArrayList<Point>();
-        Point startPoint = segmentPath.getFirstPoint();
-        pointList.add(startPoint);
-        for (Point p : segmentPath.getPathWithoutExtremities()) {
-            Point endPoint = p;
-            // draw(startPoint, endPoint, false);
-            pointList.add(endPoint);
-            segmentSet.add(new Segment(startPoint, endPoint));
-            startPoint = endPoint;
-        }
-        // Draw last segment
-        Point lastPoint = segmentPath.getLastPoint();
-        pointList.add(lastPoint);
-        segmentSet.add(new Segment(startPoint, lastPoint));
-        // draw(startPoint, lastPoint,true);
+	public void setSynchronized(boolean sync) {
+		if (allowSync) {
+			this.sync = sync;
+		}
+	}
+	
+	public void delete(){
+		canvas.asWidget().removeFromParent();
+	}
 
-        // Draw All the register point
-        draw(pointList);
+	public void draw() {
+		// Reset the segments
+		segmentSet = new HashSet<Segment>();
 
-        updateDecoration();
-        setSynchronized(true);
-    }
+		// Draw each segment
+		segmentPath.update();
+		List<Point> pointList = new ArrayList<Point>();
+		Point startPoint = segmentPath.getFirstPoint();
+		pointList.add(startPoint);
+		for (Point p : segmentPath.getPathWithoutExtremities()) {
+			Point endPoint = p;
+			pointList.add(endPoint);
+			segmentSet.add(new Segment(startPoint, endPoint));
+			startPoint = endPoint;
+		}
+		// Draw last segment
+		Point lastPoint = segmentPath.getLastPoint();
+		pointList.add(lastPoint);
+		segmentSet.add(new Segment(startPoint, lastPoint));
 
-    private void updateDecoration() {
-        if (decoration != null) {
-            Segment decoratedSegment = segmentPath.getMiddleSegment();
-            Point decorationCenter = decoratedSegment.middle();
-            int width = decoration.getWidth();
-            int height = decoration.getHeight();
-            decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop() - height / 2, Unit.PX);
-            decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft() - width / 2, Unit.PX);
-        }
-    }
+		// Draw All the register point
+		draw(pointList);
 
-    public MovablePoint addMovablePoint(Point p) {
-        Point startSegmentPoint = highlightSegment.getP1();
-        Point endSegmentPoint = highlightSegment.getP2();
-        MovablePoint movablePoint = new MovablePoint(p);
-        segmentPath.add(movablePoint, startSegmentPoint, endSegmentPoint);
-        return movablePoint;
-    }
+		updateDecoration();
+		setSynchronized(true);
+	}
 
-    private Point findHighlightPoint(Point p) {
-        for (Segment s : segmentSet) {
-            if (ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
-                Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
-                highlightSegment = s;
-                highlightPoint = hPoint;
-                return highlightPoint;
-            }
-        }
-        return null;
-    }
+	private void updateDecoration() {
+		if (decoration != null) {
+			Segment decoratedSegment = segmentPath.getMiddleSegment();
+			Point decorationCenter = decoratedSegment.middle();
+			int width = decoration.getWidth();
+			int height = decoration.getHeight();
+			decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop() - height / 2, Unit.PX);
+			decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft() - width / 2, Unit.PX);
+		}
+	}
 
-    public Point highlightMovablePoint(Point p) {
-        Point hPoint = findHighlightPoint(p);
-        /*
-         * if(hPoint != null){
-         * DiagramCanvas canvas = controller.getDiagramCanvas();
-         * canvas.beginPath();
-         * canvas.arc(hPoint.getLeft(), hPoint.getTop(), 5, 0, Math.PI*2, false);
-         * canvas.setStrokeStyle(highlightPointColor);
-         * canvas.stroke();
-         * canvas.setFillStyle(highlightPointColor);
-         * canvas.fill();
-         * canvas.closePath();
-         * }
-         */
-        setHighlightPoint(hPoint);
-        return hPoint;
-    }
+	public MovablePoint addMovablePoint(Point p) {
+		Point startSegmentPoint = highlightSegment.getP1();
+		Point endSegmentPoint = highlightSegment.getP2();
+		MovablePoint movablePoint = new MovablePoint(p);
+		segmentPath.add(movablePoint, startSegmentPoint, endSegmentPoint);
+		return movablePoint;
+	}
 
-    public List<Point> getMovablePoints() {
-        return segmentPath.getPathWithoutExtremities();
-    }
+	private Point findHighlightPoint(Point p) {
+		for (Segment s : segmentSet) {
+			if (ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+				Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
+				highlightSegment = s;
+				highlightPoint = hPoint;
+				return highlightPoint;
+			}
+		}
+		return null;
+	}
 
-    public void removeDecoration() {
-        decoration = null;
-    }
+	public Point highlightMovablePoint(Point p) {
+		Point hPoint = findHighlightPoint(p);
+		setHighlightPoint(hPoint);
+		return hPoint;
+	}
 
-    public void setStraight() {
-        segmentPath.straightPath();
-    }
+	public List<Point> getMovablePoints() {
+		return segmentPath.getPathWithoutExtremities();
+	}
 
-    public Shape getStartShape() {
-        return startShape;
-    }
+	public void removeDecoration() {
+		decoration = null;
+	}
 
-    public Shape getEndShape() {
-        return endShape;
-    }
+	public void setStraight() {
+		segmentPath.straightPath();
+		setSynchronized(false);
+	}
 
-    public boolean isMouseNearConnection(Point p) {
-        for (Segment s : segmentSet) {
-            if (!s.getP1().equals(s.getP2()) && ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
-                return true;
-            }
-        }
-        return false;
-    }
+	public Shape getStartShape() {
+		return startShape;
+	}
 
-    public Point getHighlightPoint() {
-        return highlightPoint;
-    }
+	public Shape getEndShape() {
+		return endShape;
+	}
 
-    public void setHighlightPoint(Point highlightPoint) {
-        this.highlightPoint = highlightPoint;
-    }
+	public boolean isMouseNearConnection(Point p) {
+		for (Segment s : segmentSet) {
+			if (!s.getP1().equals(s.getP2()) && ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    public void setDecoration(DecorationShape decoration) {
-        this.decoration = decoration;
-    }
+	public Point getHighlightPoint() {
+		return highlightPoint;
+	}
 
-    public DecorationShape getDecoration() {
-        return decoration;
-    }
+	public void setHighlightPoint(Point highlightPoint) {
+		this.highlightPoint = highlightPoint;
+	}
 
-    @Override
-    public ContextMenu getContextMenu() {
-        return menu;
-    }
-    
-    public static void setStraightenText(String text){
-    	straightenMenuText = text;
-    }
+	public void setDecoration(DecorationShape decoration) {
+		this.decoration = decoration;
+	}
 
-    public static void setDeleteText(String text){
-    	deleteMenuText = text;
-    }
-    public void setController(DiagramController controller) {
-        this.controller = controller;
-        this.canvas = controller.getDiagramCanvas();
-    }
+	public DecorationShape getDecoration() {
+		return decoration;
+	}
 
-    @Override
-    public void drawHighlight() {
-    }
+	@Override
+	public ContextMenu getContextMenu() {
+		return menu;
+	}
 
-    @Override
-    public void allowSynchronized(boolean allowSynchronized) {
-        this.allowSync = allowSynchronized;
-    }
-    
+	public static void setStraightenText(String text){
+		straightenMenuText = text;
+	}
+
+	public static void setDeleteText(String text){
+		deleteMenuText = text;
+	}
+	public void setController(DiagramController controller) {
+		this.controller = controller;
+	}
+
+	@Override
+	public void drawHighlight() {
+	}
+
+	@Override
+	public void allowSynchronized(boolean allowSynchronized) {
+		this.allowSync = allowSynchronized;
+	}
+
 }

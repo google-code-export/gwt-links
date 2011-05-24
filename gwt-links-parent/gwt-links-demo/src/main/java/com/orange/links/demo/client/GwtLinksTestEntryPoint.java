@@ -172,8 +172,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		}
 		
 		// Create the drawing zone
-		MultiBrowserDiagramCanvas canvas = new MultiBrowserDiagramCanvas(tabWidth,tabHeight);
-		currentController = new DiagramController(canvas);
+		currentController = new DiagramController(tabWidth,tabHeight);
 		currentController.showGrid(true);
 		
 		Widget w = currentController.getView();
@@ -181,7 +180,6 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		globalPanel.insert(w, index);
 		
-//		currentController.addWidget(new Label("test"), 25, 25);
 		example.draw(currentController);
 		
 	}

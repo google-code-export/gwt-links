@@ -35,7 +35,7 @@ public class MultiBrowserDiagramCanvas implements DiagramCanvas{
 
 	@Override
 	public void setBackground() {
-		this.getElement().getStyle().setZIndex(1);
+		this.getElement().getStyle().setZIndex(2);
 	}
 
 

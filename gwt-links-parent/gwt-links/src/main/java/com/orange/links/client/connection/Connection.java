@@ -73,6 +73,11 @@ public interface Connection extends Drawable, HasContextMenu {
 	 */
 	boolean isMouseNearConnection(Point mousePoint);
 	
+	/**
+	 * Delete the connection from the absolutepanel
+	 */
+	public void delete();
+	
 	void setController(DiagramController controller);
 
 }
