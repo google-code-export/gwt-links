@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=lib/gwt-log-3.1.2.jar -Dsources=lib/gwt-log-3.1.2.jar -DgroupId=com.allen_sauer.gwt.log -DartifactId=gwt-log -Dversion=3.1.2 -Dpackaging=jar -DgeneratePom=true -DcreateChecksum=true
