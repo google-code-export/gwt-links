@@ -79,7 +79,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 				updateEditionPanel(editionPanel);
 			}
 		};
-//		timer.scheduleRepeating(500);
+		timer.scheduleRepeating(500);
 		editionPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		editionPanel.getElement().getStyle().setPadding(10, Unit.PX);
 		editionPanel.getElement().getStyle().setMargin(10, Unit.PX);
