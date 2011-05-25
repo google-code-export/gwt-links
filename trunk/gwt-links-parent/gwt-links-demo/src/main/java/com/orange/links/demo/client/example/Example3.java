@@ -50,7 +50,7 @@ public class Example3  extends AbstractExample{
 
 	@Override
 	public String getSourceLink() {
-		return "http://code.google.com/p/gwt-links/source/browse/trunk/demo/com/orange/links/test/client/example/Example3.java";
+		return "http://code.google.com/p/gwt-links/source/browse/trunk/gwt-links-parent/gwt-links-demo/src/main/java/com/orange/links/demo/client/example/Example3.java";
 	}
 
 }
