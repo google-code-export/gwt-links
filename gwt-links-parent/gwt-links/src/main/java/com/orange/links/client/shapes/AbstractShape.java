@@ -16,7 +16,7 @@ public abstract class AbstractShape implements Shape {
     private int offsetWidth = -1;
     private int offsetHeight = -1;
     private boolean sync;
-    protected boolean allowSync;
+    protected boolean allowSync = true;
 
     private DrawableSet<Connection> connections = new DrawableSet<Connection>();
 
@@ -31,6 +31,10 @@ public abstract class AbstractShape implements Shape {
 
     public void setSynchronized(boolean sync) {
         this.sync = sync;
+    }
+    
+    public boolean allowSynchronized(){
+    	return allowSync;
     }
 
     public int getLeft() {
@@ -123,7 +127,7 @@ public abstract class AbstractShape implements Shape {
     }
 
     @Override
-    public void allowSynchronized(boolean allowSynchronized) {
+    public void setAllowSynchronized(boolean allowSynchronized) {
         this.allowSync = allowSynchronized;
     }
     

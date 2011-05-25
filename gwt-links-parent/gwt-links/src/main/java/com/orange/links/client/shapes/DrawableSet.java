@@ -57,10 +57,20 @@ public class DrawableSet<D extends Drawable> extends HashSet<D> implements Drawa
     }
 
     @Override
-    public void allowSynchronized(boolean allowSynchronized) {
+    public void setAllowSynchronized(boolean allowSynchronized) {
         for (Drawable drawable : this) {
-            drawable.allowSynchronized(allowSynchronized);
+            drawable.setAllowSynchronized(allowSynchronized);
         }
+    }
+    
+    @Override
+    public boolean allowSynchronized(){
+    	 for (Drawable drawable : this) {
+             if (!drawable.allowSynchronized()) {
+                 return false;
+             }
+         }
+         return true;
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })

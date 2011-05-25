@@ -32,6 +32,10 @@ public interface Drawable {
      * 
      * @param allowSynchronized whether or not the Drawable should allow itself to be set as synchronized.
      */
-    void allowSynchronized(boolean allowSynchronized);
+    void setAllowSynchronized(boolean allowSynchronized);
     
+    /**
+     * @return wether or not the drawable allow to be synchronied by itself
+     */
+    boolean allowSynchronized();
 }

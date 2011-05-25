@@ -46,7 +46,7 @@ public abstract class AbstractConnection implements Connection {
 	protected static String straightenMenuText = "Straighten";
 
 	private boolean sync;
-	private boolean allowSync;
+	private boolean allowSync = true;
 
 	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
 		this.startShape = startShape;
@@ -103,6 +103,10 @@ public abstract class AbstractConnection implements Connection {
 		if (allowSync) {
 			this.sync = sync;
 		}
+	}
+	
+	public boolean allowSynchronized(){
+		return allowSync;
 	}
 	
 	public void delete(){
@@ -240,7 +244,7 @@ public abstract class AbstractConnection implements Connection {
 	}
 
 	@Override
-	public void allowSynchronized(boolean allowSynchronized) {
+	public void setAllowSynchronized(boolean allowSynchronized) {
 		this.allowSync = allowSynchronized;
 	}
 
