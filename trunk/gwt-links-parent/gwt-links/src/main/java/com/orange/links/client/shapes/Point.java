@@ -131,7 +131,12 @@ public class Point implements Shape {
     }
 
     @Override
-    public void allowSynchronized(boolean allowSynchronized) {
+    public void setAllowSynchronized(boolean allowSynchronized) {
+    }
+    
+    @Override
+    public boolean allowSynchronized(){
+    	return true;
     }
 
     @Override

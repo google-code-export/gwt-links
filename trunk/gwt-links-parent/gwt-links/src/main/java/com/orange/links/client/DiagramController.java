@@ -73,7 +73,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 * Timer refresh duration, in milliseconds. It defers if the application is running in development mode
 	 * or in the web mode
 	 */
-	public static int refreshRate = GWT.isScript() ? 25 : 500;
+	public static int refreshRate = GWT.isScript() ? 25 : 50;
 
 	private DiagramCanvas topCanvas;
 	private DragController dragController;
@@ -116,8 +116,8 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 * Initialize the controller diagram. Use this constructor to start your diagram. A code sample is : <br/>
 	 * <br/>
 	 * <code>
-	 * 		DiagramCanvas canvas = new MultiBrowserDiagramCanvas(400,400);<br/>
-	 * 		DiagramController controller = new DiagramController(canvas);<br/>
+	 * 		DiagramController controller = new DiagramController(400,400);<br/>
+	 * 		RootPanel.get().add(controller.getView());
 	 * </code> <br/>
 	 * 
 	 * @param canvas
@@ -202,7 +202,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 */
 	public void clearDiagram() {
 		connections.clear();
-		// shapeMap.clear();
+		widgetShapeMap.clear();
 		shapes.clear();
 		startFunctionWidget = null;
 		buildConnection = null;
@@ -382,7 +382,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 					Shape s = widgetShapeMap.get(widget);
 					if(shape.equals(s)){
 						shape.setSynchronized(true);
-						shape.getConnections().allowSynchronized(true);
+						shape.getConnections().setAllowSynchronized(true);
 						shape.getConnections().setSynchronized(true);
 					}
 				}
@@ -395,7 +395,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 						GWT.log("Drag start with " + shape.getConnections().size() + " connections");
 						shape.setSynchronized(false);
 						shape.getConnections().setSynchronized(false);
-						shape.getConnections().allowSynchronized(false);
+						shape.getConnections().setAllowSynchronized(false);
 					}
 				}
 			});
@@ -481,13 +481,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		}
 	};
 
-	/**
-	 * 
-	 * @return the fps which are really displayed (frame per second)
-	 */
-	public long getFps() {
-		return fps;
-	}
+
 
 	public void update() {
 		topCanvas.clear();
@@ -591,6 +585,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		if (inDragMovablePoint) {
 			movablePoint.setFixed(true);
 			inDragMovablePoint = false;
+			highlightConnection.setAllowSynchronized(true);
 			return;
 		}
 
@@ -639,7 +634,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			inEditionDragMovablePoint = false;
 			movablePoint = highlightConnection.addMovablePoint(highlightPoint);
 			highlightConnection.setSynchronized(false);
-			highlightConnection.allowSynchronized(false);
+			highlightConnection.setAllowSynchronized(false);
 			movablePoint.setTrackPoint(mousePoint);
 			return;
 		}
@@ -669,7 +664,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		Shape startShape = new FunctionShape(this, startFunctionWidget);
 		final MouseShape endShape = new MouseShape(mousePoint);
 		buildConnection = drawConnection(ConnectionFactory.ARROW, startShape, endShape);
-		buildConnection.allowSynchronized(false);
+		buildConnection.setAllowSynchronized(false);
 		buildConnection.setSynchronized(false);
 		connections.add(buildConnection);
 	}
@@ -695,5 +690,24 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		return canvasHeight;
 	}
 
+	/*
+	 * Public methods to debug
+	 */
 
+	/**
+	 * 
+	 * @return the fps which are really displayed (frame per second)
+	 */
+	public long getFps() {
+		return fps;
+	}
+	
+	/**
+	 * 
+	 * @return unsynchronized connection
+	 */
+	public DrawableSet<Connection> getUnsynchronizedConnections(){
+		return connections.getUnsynchronizedDrawables();
+	}
+	
 }
