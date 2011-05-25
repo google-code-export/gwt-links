@@ -28,7 +28,7 @@ public class Example3  extends AbstractExample{
 		dragController.makeDraggable(labelHello);
 		dragController.makeDraggable(labelWorld);
 		dragController.makeDraggable(img);
-		//controller.registerDragController(dragController);
+		controller.registerDragController(dragController);
 		
 		// Add the logic
 		controller.drawStraightArrowConnection(labelHello, labelWorld);

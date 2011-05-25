@@ -25,7 +25,7 @@ public class Example1 extends AbstractExample{
 		dragController.makeDraggable(labelHello);
         dragController.makeDraggable(hasMenu);
         
-		//controller.registerDragController(dragController);
+		controller.registerDragController(dragController);
 		
 		// Add the logic
 		Connection con = controller.drawStraightArrowConnection(labelHello, hasMenu);

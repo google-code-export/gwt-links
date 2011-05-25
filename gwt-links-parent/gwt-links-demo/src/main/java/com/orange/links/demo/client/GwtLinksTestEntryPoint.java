@@ -15,10 +15,13 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;
+import com.orange.links.client.connection.Connection;
 import com.orange.links.client.event.TieLinkEvent;
 import com.orange.links.client.event.TieLinkHandler;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkHandler;
+import com.orange.links.client.shapes.Drawable;
+import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.demo.client.example.AbstractExample;
 import com.orange.links.demo.client.example.Example1;
 import com.orange.links.demo.client.example.Example2;
@@ -116,7 +119,13 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	private void updateEditionPanel(VerticalPanel panel){
 		panel.clear();
 		panel.add(new Label("FPS : " + currentController.getFps()));
-//		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
+	
+		/*DrawableSet<Connection> unsynchroSet = currentController.getUnsynchronizedConnections();
+		for(Drawable d : unsynchroSet){
+			panel.add(new Label("Connection #" + d.hashCode() + " : AllowSynchro? " + d.allowSynchronized()));
+		}*/
+		//		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
+		
 		// InDragBuildArrow
 		if(currentController.isInDragBuildArrow()){
 			Label dragBuildLabel = new Label("Active : inDragBuildArrow");
@@ -167,20 +176,17 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		int index = 0;
 		if(currentController != null){
 			currentController.clearDiagram();
-			index = globalPanel.getWidgetIndex(currentController.getView());
-			globalPanel.remove(currentController.getView());
+		}
+		else{
+			// Create the drawing zone
+			currentController = new DiagramController(tabWidth,tabHeight);
+			currentController.showGrid(true);
+			Widget w = currentController.getView();
+			w.getElement().getStyle().setMargin(10, Unit.PX);
+			w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
+			globalPanel.insert(w, index);
 		}
 		
-		// Create the drawing zone
-		currentController = new DiagramController(tabWidth,tabHeight);
-		currentController.showGrid(true);
-		
-		Widget w = currentController.getView();
-		w.getElement().getStyle().setMargin(10, Unit.PX);
-		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
-		globalPanel.insert(w, index);
-		
 		example.draw(currentController);
-		
 	}
 }
