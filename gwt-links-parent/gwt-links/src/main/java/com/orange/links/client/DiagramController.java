@@ -100,6 +100,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	private Point highlightPoint;
 	private Connection highlightConnection;
 	private MovablePoint movablePoint;
+	private FunctionShape highlightFunctionShape;
 
 	private Widget startFunctionWidget;
 	private Connection buildConnection;
@@ -505,6 +506,11 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			FunctionShape s = getShapeUnderMouse();
 			if (s != null) {
 				s.drawHighlight();
+				highlightFunctionShape = s;
+			}
+			else if(highlightFunctionShape != null) {
+				highlightFunctionShape.draw();
+				highlightFunctionShape = null;
 			}
 			clearAnimationsOnCanvas();
 		}
@@ -602,11 +608,8 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			deleteConnection(buildConnection);
 			inDragBuildArrow = false;
 			buildConnection = null;
-			for (FunctionShape s : shapes) {
-				if (!s.isSynchronized()) {
-					s.draw();
-				}
-			}
+			highlightFunctionShape.draw();
+			highlightFunctionShape = null;
 			clearAnimationsOnCanvas();
 		}
 
