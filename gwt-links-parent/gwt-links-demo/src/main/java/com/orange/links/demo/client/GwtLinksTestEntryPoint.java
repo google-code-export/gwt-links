@@ -66,7 +66,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		infoPanel.add(infoLabel);
 		
 		infoPanel.add(new Label("Refresh Rate : " + DiagramController.refreshRate + "ms"));
-		infoPanel.add(new HTML("Source Page :  <a href=\"http://goo.gl/bevvN\">http://goo.gl/bevvN</a>"));
+		infoPanel.add(new HTML("Source Page :  <a href=\"http://goo.gl/Vt4wN\">http://goo.gl/Vt4wN</a>"));
 		infoPanel.add(new HTML("Contextual Menu :  Right Click on a connection"));
 		infoPanel.getElement().getStyle().setProperty("border", "1px solid #cccccc");
 		infoPanel.getElement().getStyle().setPadding(10, Unit.PX);
