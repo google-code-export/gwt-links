@@ -2,3 +2,7 @@
 #labels Roadmap,Featured
 
 == New features to develop ==
+  * Possibility to disable selectable areas
+  * Add a build arrow without clicking on selectable areas
+  * Import / Export the diagram with an XML format
+  * Canvas larger than the panel with a ScrollPanel
