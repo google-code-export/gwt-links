@@ -129,7 +129,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		this.canvasHeight = canvasHeight;
 		this.topCanvas = new MultiBrowserDiagramCanvas(canvasWidth, canvasHeight);
 		this.backgroundCanvas = new BackgroundCanvas(canvasWidth, canvasHeight);
-		ConnectionFactory.setDiagramController(this);
 		
 		handlerManager = new HandlerManager(topCanvas);
 		LinksClientBundle.INSTANCE.css().ensureInjected();
@@ -237,7 +236,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
 	private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Shape start, Shape end) {
 		// Create Connection and Store it in the controller
-		C c = cf.create(start, end);
+		C c = cf.create(this,start, end);
 		c.setController(this);
 		connections.add(c);
 		start.addConnection(c);
@@ -284,6 +283,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			}, MouseUpEvent.getType());
 		}
 		widgetPanel.add(w, left, top);
+		
+		// Register the drag handler
+		if(dragController != null)
+			registerDragHandler(shape);
 	}
 
 	public void addWidgetAtMousePoint(final Widget w) {
@@ -374,33 +377,36 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 */
 	public void registerDragController(DragController dragController) {
 		this.dragController = dragController;
-		for(final FunctionShape shape : shapes){
-			this.dragController.addDragHandler(new DragHandlerAdapter() {
-
-				@Override
-				public void onDragEnd(DragEndEvent event) {
-					Widget widget = event.getContext().draggable;
-					Shape s = widgetShapeMap.get(widget);
-					if(shape.equals(s)){
-						shape.setSynchronized(true);
-						shape.getConnections().setAllowSynchronized(true);
-						shape.getConnections().setSynchronized(true);
-					}
-				}
-
-				@Override
-				public void onDragStart(DragStartEvent event) {
-					Widget widget = event.getContext().draggable;
-					Shape s = widgetShapeMap.get(widget);
-					if(shape.equals(s)){
-						GWT.log("Drag start with " + shape.getConnections().size() + " connections");
-						shape.setSynchronized(false);
-						shape.getConnections().setSynchronized(false);
-						shape.getConnections().setAllowSynchronized(false);
-					}
-				}
-			});
+		for(FunctionShape shape : shapes){
+			registerDragHandler(shape);
 		}
+	}
+	
+	protected void registerDragHandler(final FunctionShape shape){
+		this.dragController.addDragHandler(new DragHandlerAdapter() {
+			@Override
+			public void onDragEnd(DragEndEvent event) {
+				Widget widget = event.getContext().draggable;
+				Shape s = widgetShapeMap.get(widget);
+				if(shape.equals(s)){
+					shape.setSynchronized(true);
+					shape.getConnections().setAllowSynchronized(true);
+					shape.getConnections().setSynchronized(true);
+				}
+			}
+
+			@Override
+			public void onDragStart(DragStartEvent event) {
+				Widget widget = event.getContext().draggable;
+				Shape s = widgetShapeMap.get(widget);
+				if(shape.equals(s)){
+					GWT.log("gwt-links : DragStart " + shape);
+					shape.setSynchronized(false);
+					shape.getConnections().setSynchronized(false);
+					shape.getConnections().setAllowSynchronized(false);
+				}
+			}
+		});
 	}
 
 	@Override

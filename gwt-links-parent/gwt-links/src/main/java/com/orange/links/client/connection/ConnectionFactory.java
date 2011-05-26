@@ -4,8 +4,6 @@ import com.orange.links.client.DiagramController;
 import com.orange.links.client.shapes.Shape;
 
 public class ConnectionFactory<C extends Connection> {
-
-	private static DiagramController controller;
 	
     public static ConnectionFactory<StraightConnection> STRAIGHT = new ConnectionFactory<StraightConnection>(ConnectionType.PLAIN);
     public static ConnectionFactory<StraightArrowConnection> ARROW = new ConnectionFactory<StraightArrowConnection>(ConnectionType.SINGLE_ARROW);
@@ -19,7 +17,7 @@ public class ConnectionFactory<C extends Connection> {
     }
     
     @SuppressWarnings("unchecked")
-    public C create(Shape start, Shape end) {
+    public C create(DiagramController controller, Shape start, Shape end) {
         switch (type) {
         case PLAIN: 
                 return (C) new StraightConnection(controller, start, end);
@@ -29,10 +27,4 @@ public class ConnectionFactory<C extends Connection> {
                 throw new UnsupportedOperationException("undefined connection type: " + type);
         }
     }
-    
-    public static void setDiagramController(DiagramController diagramController){
-    	controller = diagramController;
-    }
-    
-    
 }

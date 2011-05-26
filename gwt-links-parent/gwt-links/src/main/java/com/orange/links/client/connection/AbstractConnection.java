@@ -61,7 +61,7 @@ public abstract class AbstractConnection implements Connection {
 
 		setController(controller);
 		canvas = new ConnectionCanvas(controller.getCanvasWidth(), controller.getCanvasHeight());
-		controller.getView().add(canvas.asWidget());
+		this.controller.getView().add(canvas.asWidget());
 	}
 
 

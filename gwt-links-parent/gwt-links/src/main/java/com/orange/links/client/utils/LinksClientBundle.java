@@ -19,6 +19,9 @@ public interface LinksClientBundle extends ClientBundle{
 		
 		@ClassName("links-translucide")
 		public String translucide();
+		
+		@ClassName("links-connection-canvas")
+		public String connectionCanvas();
 	}
 	
 	static final LinksClientBundle INSTANCE = GWT.create(LinksClientBundle.class);
