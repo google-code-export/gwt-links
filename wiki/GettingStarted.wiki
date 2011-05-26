@@ -1,8 +1,7 @@
 #labels Featured
 == Project Setup ==
-  # add the gwt-links archive in your application library folder (for example war/WEB-INF/lib/) 
-  # add the archive of the gwt-incubator library [http://google-web-toolkit-incubator.googlecode.com/files/gwt-incubator-20101117-r1766.jar gwt-incubator.jar] in your application library folder (for example war/WEB-INF/lib/)
-
+  # Add the gwt-links archive in your application library folder (for example war/WEB-INF/lib/) 
+  # Add the archive of the gwt-incubator library [http://google-web-toolkit-incubator.googlecode.com/files/gwt-incubator-20101117-r1766.jar gwt-incubator.jar] in your application library folder (for example war/WEB-INF/lib/)
   # Insert in your module file (ending with .gwt.xml) the lines below :
 
 {{{
