@@ -19,3 +19,8 @@
     -ms-filter: "alpha(opacity=30)"; /* IE 8 */
     filter : alpha(opacity='30'); /* IE < 8 */
   }
+  
+.links-connection-canvas{
+	left: 0px;
+	top: 0px;
+}
