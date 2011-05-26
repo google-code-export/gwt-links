@@ -7,5 +7,3 @@
   * Stop refreshing when nothing happens
   * In diagram controller, method to build arrow without clicking on a selectable area
   * Possibility to disable selectable areas
-
-== Features to test before the next release ==
