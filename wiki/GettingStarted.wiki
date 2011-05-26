@@ -12,15 +12,9 @@
 
 == Simple Example ==
 
-Begin by creating a new canvas. You can choose a canvas supported by many browsers (IE 6 included) or a pure HTML5 application :
+Begin by instantiating a controller to manage the events and the links logic :
 {{{
-DiagramCanvas canvas = new MultiBrowserDiagramCanvas(400,400);
-// or DiagramCanvas canvas = new Html5DiagramCanvas(400,400); for a Html5 implementation
-}}}
-
-Then, instantiate a controller to manage the events and the links logic :
-{{{
-DiagramController controller = new DiagramController(canvas);
+DiagramController controller = new DiagramController(400,400);
 controller.showGrid(true); // Display a background grid
 }}}
 
@@ -56,4 +50,6 @@ Finally, you can use the gwt-dnd library to drag them on the canvas :
 PickupDragController dragController = new PickupDragController(controller.getView(), true);
 dragController.makeDraggable(labelHello);
 dragController.makeDraggable(labelWorld);
+// Register the dragController in gwt-links
+controller.registerDragController(dragController);
 }}}
