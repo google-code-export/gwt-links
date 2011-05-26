@@ -1,6 +1,17 @@
 #summary Release Notes for gwt-links
 #labels ReleaseNotes,Featured
 
+== What's new in gwt-links-1.3.jar ?==
+
+=== Bug fixes ===
+  * FunctionShape stays translucide on Mouse Over
+  * Left and right selectable ares doesn't appear
+
+=== New in this release ===
+  * Improve the refresh system performance
+  * Stop refreshing when nothing happens
+  * Some refactoring
+
 == What's new in gwt-links-1.2.jar ?==
 
 === Bug Fixes ===
