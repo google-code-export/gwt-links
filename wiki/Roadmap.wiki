@@ -2,8 +2,3 @@
 #labels Roadmap,Featured
 
 == New features to develop ==
-
-  * Improve the refresh system
-  * Stop refreshing when nothing happens
-  * In diagram controller, method to build arrow without clicking on a selectable area
-  * Possibility to disable selectable areas
