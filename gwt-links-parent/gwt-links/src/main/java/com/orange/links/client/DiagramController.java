@@ -17,11 +17,13 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.gen2.event.dom.client.MouseOverEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -92,10 +94,11 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	private Point mouseOffsetPoint = new Point(0, 0);
 
 	// Drag Edition status
-	private boolean inEditionDragMovablePoint = false;
-	private boolean inEditionSelectableShapeToDrawConnection = false;
-	private boolean inDragBuildArrow = false;
-	private boolean inDragMovablePoint = false;
+	public boolean inEditionDragMovablePoint = false;
+	public boolean inEditionSelectableShapeToDrawConnection = false;
+	public boolean inDragBuildArrow = false;
+	public boolean inDragMovablePoint = false;
+	public boolean inDragWidget = false;
 
 	private Point highlightPoint;
 	private Connection highlightConnection;
@@ -287,6 +290,16 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		// Register the drag handler
 		if(dragController != null)
 			registerDragHandler(shape);
+		
+		// If the is mouse is over the widget, clear the topCanvas
+		w.addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(com.google.gwt.event.dom.client.MouseOverEvent arg0) {
+				topCanvas.clear();
+				mousePoint.setLeft(-30);
+				mousePoint.setTop(-30);
+			}
+		}, com.google.gwt.event.dom.client.MouseOverEvent.getType());
 	}
 
 	public void addWidgetAtMousePoint(final Widget w) {
@@ -306,6 +319,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		decoration.getElement().getStyle().setPosition(Position.ABSOLUTE);
 		widgetPanel.add(decoration);
 		decoratedConnection.setDecoration(new DecorationShape(this, decoration));
+		decoratedConnection.setSynchronized(false);
 	}
 
 	/**
@@ -384,8 +398,15 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	
 	protected void registerDragHandler(final FunctionShape shape){
 		this.dragController.addDragHandler(new DragHandlerAdapter() {
+			
+			@Override
+			public void onPreviewDragEnd(DragEndEvent event){
+				shape.getConnections().draw();
+			}
+			
 			@Override
 			public void onDragEnd(DragEndEvent event) {
+				inDragWidget = false;
 				Widget widget = event.getContext().draggable;
 				Shape s = widgetShapeMap.get(widget);
 				if(shape.equals(s)){
@@ -397,6 +418,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
 			@Override
 			public void onDragStart(DragStartEvent event) {
+				inDragWidget = true;
 				Widget widget = event.getContext().draggable;
 				Shape s = widgetShapeMap.get(widget);
 				if(shape.equals(s)){
@@ -427,38 +449,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	@Override
 	public HandlerRegistration addChangeOnDiagramHandler(ChangeOnDiagramHandler handler) {
 		return handlerManager.addHandler(ChangeOnDiagramEvent.getType(), handler);
-	}
-
-	/**
-	 * 
-	 * @return true if on click, the connection will receive a new movable point
-	 */
-	public boolean isInEditionDragMovablePoint() {
-		return inEditionDragMovablePoint;
-	}
-
-	/**
-	 * 
-	 * @return true if on click, a new build arrow will be drawn between the
-	 */
-	public boolean isInEditionSelectableShapeToDrawConnection() {
-		return inEditionSelectableShapeToDrawConnection;
-	}
-
-	/**
-	 * 
-	 * @return true if the user is building an arrow (the mouse is down and a arrow is displayed)
-	 */
-	public boolean isInDragBuildArrow() {
-		return inDragBuildArrow;
-	}
-
-	/**
-	 * 
-	 * @return true if the user is dragging a movable point (the mouse is down and a curve is displayed)
-	 */
-	public boolean isInDragMovablePoint() {
-		return inDragMovablePoint;
 	}
 
 	/**
@@ -494,6 +484,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		topCanvas.clear();
 		redrawConnections();
 
+		// If the user is dragging widgets, do nothing
+		if(inDragWidget)
+			return;
+		
 		// Search for selectable area
 		if (!inDragBuildArrow) {
 			for (FunctionShape s : shapes) {
@@ -522,7 +516,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		}
 
 		// Test if in Drag Movable Point
-
 		if (!inDragMovablePoint && !inDragBuildArrow) {
 			for (Connection c : connections) {
 				if (c.isMouseNearConnection(mousePoint)) {
@@ -614,8 +607,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			deleteConnection(buildConnection);
 			inDragBuildArrow = false;
 			buildConnection = null;
-			highlightFunctionShape.draw();
-			highlightFunctionShape = null;
+			if(highlightFunctionShape != null){
+				highlightFunctionShape.draw();
+				highlightFunctionShape = null;
+			}
 			clearAnimationsOnCanvas();
 		}
 
