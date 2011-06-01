@@ -124,10 +124,10 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 		for(Drawable d : unsynchroSet){
 			panel.add(new Label("Connection #" + d.hashCode() + " : AllowSynchro? " + d.allowSynchronized()));
 		}*/
-		//		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
+		panel.add(new Label("Mouse Coords : " + currentController.getMousePoint()));
 		
 		// InDragBuildArrow
-		if(currentController.isInDragBuildArrow()){
+		if(currentController.inDragBuildArrow){
 			Label dragBuildLabel = new Label("Active : inDragBuildArrow");
 			dragBuildLabel.getElement().getStyle().setColor("green");
 			panel.add(dragBuildLabel);
@@ -138,7 +138,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 			panel.add(dragBuildLabel);
 		}
 		// InDragMovablePoint
-		if(currentController.isInDragMovablePoint()){
+		if(currentController.inDragMovablePoint){
 			Label dragMovableLabel = new Label("Active : InDragMovablePoint");
 			dragMovableLabel.getElement().getStyle().setColor("green");
 			panel.add(dragMovableLabel);
@@ -149,7 +149,7 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 			panel.add(dragMovableLabel);
 		}
 		// InEditionDragMovablePoint
-		if(currentController.isInEditionDragMovablePoint()){
+		if(currentController.inEditionDragMovablePoint){
 			Label dragBuildLabel = new Label("Active : InEditionDragMovablePoint");
 			dragBuildLabel.getElement().getStyle().setColor("green");
 			panel.add(dragBuildLabel);
@@ -160,13 +160,24 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 			panel.add(dragBuildLabel);
 		}
 		// InEditionSelectableShapeToDrawConnection
-		if(currentController.isInEditionSelectableShapeToDrawConnection()){
+		if(currentController.inEditionSelectableShapeToDrawConnection){
 			Label dragBuildLabel = new Label("Active : InEditionToDrawConnection");
 			dragBuildLabel.getElement().getStyle().setColor("green");
 			panel.add(dragBuildLabel);
 		}
 		else{
 			Label dragBuildLabel = new Label("Inactive : InEditionToDrawConnection");
+			dragBuildLabel.getElement().getStyle().setColor("red");
+			panel.add(dragBuildLabel);
+		}
+		// InDragWidget
+		if(currentController.inDragWidget){
+			Label dragBuildLabel = new Label("Active : InDragWidget");
+			dragBuildLabel.getElement().getStyle().setColor("green");
+			panel.add(dragBuildLabel);
+		}
+		else{
+			Label dragBuildLabel = new Label("Inactive : InDragWidget");
 			dragBuildLabel.getElement().getStyle().setColor("red");
 			panel.add(dragBuildLabel);
 		}
