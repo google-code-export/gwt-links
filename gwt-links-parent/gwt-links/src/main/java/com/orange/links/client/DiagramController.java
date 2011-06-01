@@ -422,7 +422,6 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 				Widget widget = event.getContext().draggable;
 				Shape s = widgetShapeMap.get(widget);
 				if(shape.equals(s)){
-					GWT.log("gwt-links : DragStart " + shape);
 					shape.setSynchronized(false);
 					shape.getConnections().setSynchronized(false);
 					shape.getConnections().setAllowSynchronized(false);
