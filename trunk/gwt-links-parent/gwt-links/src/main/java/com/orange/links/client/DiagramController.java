@@ -480,12 +480,13 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
 
 	public void update() {
-		topCanvas.clear();
 		redrawConnections();
 
 		// If the user is dragging widgets, do nothing
 		if(inDragWidget)
 			return;
+		
+		topCanvas.clear();
 		
 		// Search for selectable area
 		if (!inDragBuildArrow) {
@@ -588,6 +589,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 
 		if (inDragMovablePoint) {
 			movablePoint.setFixed(true);
+			topCanvas.setBackground();
 			inDragMovablePoint = false;
 			highlightConnection.setAllowSynchronized(true);
 			return;
@@ -639,6 +641,8 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			highlightConnection.setSynchronized(false);
 			highlightConnection.setAllowSynchronized(false);
 			movablePoint.setTrackPoint(mousePoint);
+			// Set canvas foreground to avoid dragging over a widget
+			topCanvas.setForeground();
 			return;
 		}
 	}
