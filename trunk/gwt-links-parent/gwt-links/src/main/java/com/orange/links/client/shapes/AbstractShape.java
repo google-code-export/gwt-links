@@ -30,7 +30,9 @@ public abstract class AbstractShape implements Shape {
     }
 
     public void setSynchronized(boolean sync) {
-        this.sync = sync;
+        if (allowSync) {
+            this.sync = sync;
+        }
     }
     
     public boolean allowSynchronized(){
@@ -42,7 +44,7 @@ public abstract class AbstractShape implements Shape {
     }
 
     protected int getContainerOffsetLeft() {
-        if (containerOffsetLeft < 0) {
+        if (containerOffsetLeft < 0 || !sync) {
             Element parent = DOM.getParent(widget.getElement());
             while (parent != null) {
                 if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
@@ -59,7 +61,7 @@ public abstract class AbstractShape implements Shape {
     }
 
     protected int getContainerOffsetTop() {
-        if (containerOffsetTop < 0) {
+        if (containerOffsetTop < 0 || !sync) {
             Element parent = DOM.getParent(widget.getElement());
             while (parent != null) {
                 if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
@@ -72,14 +74,14 @@ public abstract class AbstractShape implements Shape {
     }
 
     public int getWidth() {
-        if (offsetWidth < 0) {
+        if (offsetWidth < 0 || !sync) {
             offsetWidth = widget.getOffsetWidth();
         }
         return offsetWidth;
     }
 
     public int getHeight() {
-        if (offsetHeight < 0) {
+        if (offsetHeight < 0 || !sync) {
             offsetHeight = widget.getOffsetHeight();
         }
         return offsetHeight;

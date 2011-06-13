@@ -13,6 +13,11 @@ public class FunctionShape extends AbstractShape {
 	private int selectableAreaRadius = 8;
 	private CssColor highlightSelectableAreaColor = CssColor.make("#DDDDDD");
 
+	Point centerW;	
+	Point centerN;
+	Point centerS;
+	Point centerE;
+	
     public FunctionShape(DiagramController controller, Widget widget) {
         super(controller, widget);
     }
@@ -41,10 +46,12 @@ public class FunctionShape extends AbstractShape {
 
     public Couple<Direction, Point> getSelectableArea(Point p) {
         // Center of the selectable areas
-        Point centerW = new Point(getLeft(), getTop() + getHeight() / 2);
-        Point centerN = new Point(getLeft() + getWidth() / 2, getTop());
-        Point centerS = new Point(getLeft() + getWidth() / 2, getTop() + getHeight() - 1);
-        Point centerE = new Point(getLeft() + getWidth() - 1, getTop() + getHeight() / 2);
+        if (centerW == null || !isSynchronized()) {
+            centerW = new Point(getLeft(), getTop() + getHeight() / 2);
+            centerN = new Point(getLeft() + getWidth() / 2, getTop());
+            centerS = new Point(getLeft() + getWidth() / 2, getTop() + getHeight() - 1);
+            centerE = new Point(getLeft() + getWidth() - 1, getTop() + getHeight() / 2);
+        }
 
         if (p.distance(centerW) <= selectableAreaRadius) {
             return new Couple<Direction, Point>(Direction.W, centerW);
@@ -61,11 +68,13 @@ public class FunctionShape extends AbstractShape {
     @Override
     public void drawHighlight() {
         widget.addStyleName(LinksClientBundle.INSTANCE.css().translucide());        
+        setSynchronized(true);
     }
 
     @Override
     public void draw() {
         widget.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
+        setSynchronized(true);
     }
 
 }
