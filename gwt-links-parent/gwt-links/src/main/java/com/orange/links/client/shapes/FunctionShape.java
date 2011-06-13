@@ -22,6 +22,17 @@ public class FunctionShape extends AbstractShape {
         super(controller, widget);
     }
 
+    @Override
+    public void setSynchronized(boolean sync) {
+        if (allowSync && sync) {
+            centerW = null;
+            centerN = null;
+            centerS = null;
+            centerE = null;
+        }
+        super.setSynchronized(sync);
+    }
+
     public boolean isMouseNearSelectableArea(Point mousePoint) {
         return getSelectableArea(mousePoint) != null;
     }
