@@ -300,6 +300,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 				mousePoint.setTop(-30);
 			}
 		}, com.google.gwt.event.dom.client.MouseOverEvent.getType());
+		shape.draw();
 	}
 
 	public void addWidgetAtMousePoint(final Widget w) {
