@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='gwt_links'>
+	<inherits name='com.google.gwt.user.User' />
+
+	<!-- Other module inherits -->
+	<inherits name='com.google.gwt.widgetideas.WidgetIdeas' />
+	<inherits name='com.google.gwt.libideas.LibIdeas' />
+	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd"/>
+	
+	<!-- Specify the paths for translatable code -->
+	<source path='client' />
+	
+	
+</module>

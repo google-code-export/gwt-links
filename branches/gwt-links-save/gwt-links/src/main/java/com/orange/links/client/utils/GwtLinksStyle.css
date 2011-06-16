@@ -1,0 +1,26 @@
+.links-connection-popup{
+  background-color: #cccccc;
+  border: 1px solid #eeeeee;
+  z-index: 10;
+}
+
+.links-connection-popup-item {
+  font-weight: normal;
+  font-size: 80%;
+}
+
+.links-highlight-widget {
+	border: 1px solid #bbbbbb !important;
+}
+
+.links-translucide{
+    opacity : 0.3;
+    -moz-opacity : 0.3;
+    -ms-filter: "alpha(opacity=30)"; /* IE 8 */
+    filter : alpha(opacity='30'); /* IE < 8 */
+  }
+  
+.links-connection-canvas{
+	left: 0px;
+	top: 0px;
+}
