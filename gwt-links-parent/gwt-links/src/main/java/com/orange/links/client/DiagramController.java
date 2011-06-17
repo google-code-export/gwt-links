@@ -23,7 +23,6 @@ import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.gen2.event.dom.client.MouseOverEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -39,6 +38,9 @@ import com.orange.links.client.connection.ConnectionFactory;
 import com.orange.links.client.event.ChangeOnDiagramEvent;
 import com.orange.links.client.event.ChangeOnDiagramEvent.HasChangeOnDiagramHandlers;
 import com.orange.links.client.event.ChangeOnDiagramHandler;
+import com.orange.links.client.event.NewFunctionEvent;
+import com.orange.links.client.event.NewFunctionEvent.HasNewFunctionHandlers;
+import com.orange.links.client.event.NewFunctionHandler;
 import com.orange.links.client.event.TieLinkEvent;
 import com.orange.links.client.event.TieLinkEvent.HasTieLinkHandlers;
 import com.orange.links.client.event.TieLinkHandler;
@@ -47,6 +49,11 @@ import com.orange.links.client.event.UntieLinkEvent.HasUntieLinkHandlers;
 import com.orange.links.client.event.UntieLinkHandler;
 import com.orange.links.client.menu.ContextMenu;
 import com.orange.links.client.menu.HasContextMenu;
+import com.orange.links.client.save.DiagramRepresentation;
+import com.orange.links.client.save.DiagramSaveFactory;
+import com.orange.links.client.save.DiagramTranslationService;
+import com.orange.links.client.save.FunctionRepresentation;
+import com.orange.links.client.save.LinkRepresentation;
 import com.orange.links.client.shapes.DecorationShape;
 import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.client.shapes.FunctionShape;
@@ -63,7 +70,8 @@ import com.orange.links.client.utils.MovablePoint;
  * @author David Durham (david.durham.jr@gmail.com)
  * 
  */
-public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandlers, HasChangeOnDiagramHandlers, HasContextMenu {
+public class DiagramController implements HasNewFunctionHandlers,
+											HasTieLinkHandlers, HasUntieLinkHandlers, HasChangeOnDiagramHandlers, HasContextMenu {
 
 	/**
 	 * If the distance between the mouse and segment is under this number in pixels, then,
@@ -89,6 +97,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	private DrawableSet<Connection> connections = new DrawableSet<Connection>();
 	private DrawableSet<FunctionShape> shapes = new DrawableSet<FunctionShape>();
 	private Map<Widget,FunctionShape> widgetShapeMap = new HashMap<Widget,FunctionShape>();
+	private Map<Widget,Map<Widget,Connection>> functionsMap = new HashMap<Widget, Map<Widget,Connection>>();
 
 	private Point mousePoint = new Point(0, 0);
 	private Point mouseOffsetPoint = new Point(0, 0);
@@ -112,10 +121,10 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	long previousNFrame = 0;
 	long previousTime = 0;
 	long fps = 0;
-	
+
 	private int canvasWidth;
 	private int canvasHeight;
-	
+
 	/**
 	 * Initialize the controller diagram. Use this constructor to start your diagram. A code sample is : <br/>
 	 * <br/>
@@ -132,7 +141,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		this.canvasHeight = canvasHeight;
 		this.topCanvas = new MultiBrowserDiagramCanvas(canvasWidth, canvasHeight);
 		this.backgroundCanvas = new BackgroundCanvas(canvasWidth, canvasHeight);
-		
+
 		handlerManager = new HandlerManager(topCanvas);
 		LinksClientBundle.INSTANCE.css().ensureInjected();
 
@@ -206,6 +215,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	public void clearDiagram() {
 		connections.clear();
 		widgetShapeMap.clear();
+		functionsMap.clear();
 		shapes.clear();
 		startFunctionWidget = null;
 		buildConnection = null;
@@ -228,7 +238,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 * @return the created new connection between the two widgets
 	 */
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget) {
-		return drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
+		Connection c = drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
+		functionsMap.get(startWidget).put(endWidget, c);
+		return c;
 	}
 
 	private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Widget start, Widget end) {
@@ -241,7 +253,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		// Create Connection and Store it in the controller
 		C c = cf.create(this,start, end);
 		c.setController(this);
+
 		connections.add(c);
+
 		start.addConnection(c);
 		end.addConnection(c);
 		return c;
@@ -257,7 +271,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 * @return the created new connection between the two widgets
 	 */
 	public Connection drawStraightConnection(Widget startWidget, Widget endWidget) {
-		return drawConnection(ConnectionFactory.STRAIGHT, startWidget, endWidget);
+		Connection c = drawConnection(ConnectionFactory.STRAIGHT, startWidget, endWidget);
+		functionsMap.get(startWidget).put(endWidget, c);
+		return c;
 	}
 
 	/**
@@ -271,10 +287,14 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	 *            top margin with the absolute panel
 	 */
 	public void addWidget(final Widget w, int left, int top) {
+		
 		w.getElement().getStyle().setZIndex(3);
 		final FunctionShape shape = new FunctionShape(this, w);
+
 		shapes.add(shape);
 		widgetShapeMap.put(w, shape);
+		functionsMap.put(w, new HashMap<Widget, Connection>());
+
 		if (w instanceof HasContextMenu) {
 			w.addDomHandler(new MouseUpHandler() {
 				@Override
@@ -286,11 +306,12 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			}, MouseUpEvent.getType());
 		}
 		widgetPanel.add(w, left, top);
-		
+
 		// Register the drag handler
-		if(dragController != null)
+		if(dragController != null){
 			registerDragHandler(shape);
-		
+		}
+
 		// If the is mouse is over the widget, clear the topCanvas
 		w.addDomHandler(new MouseOverHandler() {
 			@Override
@@ -301,6 +322,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			}
 		}, com.google.gwt.event.dom.client.MouseOverEvent.getType());
 		shape.draw();
+		
+		// Send event
+		handlerManager.fireEvent(new NewFunctionEvent(w));
 	}
 
 	public void addWidgetAtMousePoint(final Widget w) {
@@ -396,15 +420,15 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 			registerDragHandler(shape);
 		}
 	}
-	
+
 	protected void registerDragHandler(final FunctionShape shape){
 		this.dragController.addDragHandler(new DragHandlerAdapter() {
-			
+
 			@Override
 			public void onPreviewDragEnd(DragEndEvent event){
 				shape.getConnections().draw();
 			}
-			
+
 			@Override
 			public void onDragEnd(DragEndEvent event) {
 				inDragWidget = false;
@@ -450,6 +474,12 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	public HandlerRegistration addChangeOnDiagramHandler(ChangeOnDiagramHandler handler) {
 		return handlerManager.addHandler(ChangeOnDiagramEvent.getType(), handler);
 	}
+	
+
+	@Override
+	public HandlerRegistration addNewFunctionHandler(NewFunctionHandler handler) {
+		return handlerManager.addHandler(NewFunctionEvent.getType(), handler);
+	}
 
 	/**
 	 * 
@@ -486,9 +516,9 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 		// If the user is dragging widgets, do nothing
 		if(inDragWidget)
 			return;
-		
+
 		topCanvas.clear();
-		
+
 		// Search for selectable area
 		if (!inDragBuildArrow) {
 			for (FunctionShape s : shapes) {
@@ -693,7 +723,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	public int getCanvasWidth() {
 		return canvasWidth;
 	}
-	
+
 	public int getCanvasHeight() {
 		return canvasHeight;
 	}
@@ -709,7 +739,7 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	public long getFps() {
 		return fps;
 	}
-	
+
 	/**
 	 * 
 	 * @return unsynchronized connection
@@ -717,5 +747,74 @@ public class DiagramController implements HasTieLinkHandlers, HasUntieLinkHandle
 	public DrawableSet<Connection> getUnsynchronizedConnections(){
 		return connections.getUnsynchronizedDrawables();
 	}
+
+	/**
+	 * 
+	 * 
+	 */
+	protected DiagramRepresentation getDiagramRepresentation(){
+		DiagramRepresentation diagramRepresentation = new DiagramRepresentation();
+		diagramRepresentation.setDiagramProperties(this.canvasWidth,
+				this.canvasHeight,this.showGrid);
+
+		// Add function
+		for(Widget startWidget : functionsMap.keySet()){
+			diagramRepresentation.addFunction(startWidget);
+		}
+
+		// Add links
+		for(Widget startWidget : functionsMap.keySet()){
+			for(Widget endWidget : functionsMap.get(startWidget).keySet()){
+				Connection c = functionsMap.get(startWidget).get(endWidget);
+				int[][] pointList = new int[c.getMovablePoints().size()][2];
+				int i = 0;
+				for(com.orange.links.client.shapes.Point p : c.getMovablePoints()){
+					int[] point = {p.getLeft(), p.getTop()};
+					pointList[i] = point;
+					i++;
+				}
+				diagramRepresentation.addLink(startWidget, endWidget,pointList,c);
+			}
+		}
+		return diagramRepresentation;
+	}
 	
+	public String exportDiagram(){
+		return DiagramTranslationService.exportDiagram(getDiagramRepresentation());
+	}
+	
+	public void importDiagram(String diagramXmlExport, DiagramSaveFactory saveFactory){
+		DiagramRepresentation diagramRepresentation = DiagramTranslationService.importDiagram(diagramXmlExport);
+		// Display the converted graphical representation
+		clearDiagram();
+		// Add Functions
+		Map<String,Widget> idToWidgetMap = new HashMap<String,Widget>();
+		for(FunctionRepresentation function : diagramRepresentation.getFunctionRepresentationSet()){
+			Widget w = saveFactory.getFunctionByIdentifier(function.identifier, function.content);
+			addWidget(w, function.left, function.top);
+			idToWidgetMap.put(function.id, w);
+		}
+		// Add links
+		for(LinkRepresentation link : diagramRepresentation.getLinkRepresentationSet()){
+			Widget w1 = idToWidgetMap.get(link.startId);
+			Widget w2 = idToWidgetMap.get(link.endId);
+			Connection c;
+			if(link.type != null && link.type.equals("straight")){
+				c = drawStraightConnection(w1, w2);
+			} else {
+				c = drawStraightArrowConnection(w1, w2);
+			}
+			if(link.decoration != null){
+				addDecoration(saveFactory.getDecorationByIdentifier(
+						link.decoration.identifier , link.decoration.content ), c);
+			} 
+			
+			// Add the movable points
+			for(int[] p : link.pointList){
+				c.addMovablePoint(new com.orange.links.client.shapes.Point(p[0],p[1]));
+			}
+		}
+	}
+
+
 }
