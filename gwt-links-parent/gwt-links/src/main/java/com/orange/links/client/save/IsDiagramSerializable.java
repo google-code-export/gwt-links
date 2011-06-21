@@ -1,8 +1,8 @@
 package com.orange.links.client.save;
 
-public interface Savable {
+public interface IsDiagramSerializable {
 	
-	public String getIdentifier();
+	public String getType();
 	
 	public String getContentRepresentation();
 	public void setContentRepresentation(String contentRepresentation);

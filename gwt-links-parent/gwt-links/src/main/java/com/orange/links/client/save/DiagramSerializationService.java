@@ -9,20 +9,20 @@ import com.google.gwt.xml.client.NodeList;
 import com.google.gwt.xml.client.XMLParser;
 
 
-public class DiagramTranslationService {
+public class DiagramSerializationService {
 
 	
-	public static DiagramRepresentation importDiagram(String xml){
+	public static DiagramModel importDiagram(String xml){
 		Document doc = XMLParser.parse(xml);
 		Element root = doc.getDocumentElement();
 
 		// DiagramRepresentation
-		DiagramRepresentation diagramRepresentation = new DiagramRepresentation();
+		DiagramModel diagramRepresentation = new DiagramModel();
 		
 		NodeList nodeList = root.getElementsByTagName("function");
 		for(int i=0;i<nodeList.getLength();i++){
 			Element functionElement = (Element) nodeList.item(i);
-			FunctionRepresentation function = new FunctionRepresentation();
+			FunctionModel function = new FunctionModel();
 			function.id = functionElement.getAttribute("id");
 			function.content = (functionElement.getFirstChild() != null) 
 					? functionElement.getFirstChild().toString() : null;
@@ -35,14 +35,14 @@ public class DiagramTranslationService {
 		nodeList = root.getElementsByTagName("link");
 		for(int i=0;i<nodeList.getLength();i++){
 			Element linkElement = (Element) nodeList.item(i);
-			LinkRepresentation link = new LinkRepresentation();
+			LinkModel link = new LinkModel();
 			link.startId = linkElement.getAttribute("startid");
 			link.endId = linkElement.getAttribute("endid");
 			
 			// Get decoration if exists
 			if(linkElement.getElementsByTagName("decoration").getLength() > 0){
 				Element decoration = (Element) linkElement.getElementsByTagName("decoration").item(0);
-				DecorationRepresentation decorationRepresentation = new DecorationRepresentation();
+				DecorationModel decorationRepresentation = new DecorationModel();
 				decorationRepresentation.content = decoration.getFirstChild().toString().trim();
 				decorationRepresentation.identifier = decoration.getAttribute("identifier");
 				link.decoration = decorationRepresentation;
@@ -65,7 +65,7 @@ public class DiagramTranslationService {
 		return diagramRepresentation;
 	}
 	
-	public static String exportDiagram(DiagramRepresentation diagramRepresentation){
+	public static String exportDiagram(DiagramModel diagramRepresentation){
 
 		Document doc = XMLParser.createDocument();
 		
@@ -77,8 +77,8 @@ public class DiagramTranslationService {
 		doc.appendChild(diagramRoot);
 		
 		// Function computation
-		Set<FunctionRepresentation> functionSet = diagramRepresentation.getFunctionRepresentationSet();
-		for(FunctionRepresentation function : functionSet){
+		Set<FunctionModel> functionSet = diagramRepresentation.getFunctionRepresentationSet();
+		for(FunctionModel function : functionSet){
 			Element functionElement = doc.createElement("function");
 			functionElement.setAttribute("left", function.left + "");
 			functionElement.setAttribute("top",function.top + "");
@@ -90,9 +90,9 @@ public class DiagramTranslationService {
 		}
 		
 		// Link computation
-		Set<LinkRepresentation> linkSet 
+		Set<LinkModel> linkSet 
 		= diagramRepresentation.getLinkRepresentationSet();
-		for(LinkRepresentation link : linkSet){
+		for(LinkModel link : linkSet){
 			Element linkElement = doc.createElement("link");
 			linkElement.setAttribute("startid", link.startId + "");
 			linkElement.setAttribute("endid", link.endId + "");

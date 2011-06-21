@@ -1,8 +1,8 @@
 package com.orange.links.client.save;
 
-public class DecorationRepresentation {
+public class DecorationModel {
 
 	public String content;
 	public String identifier;
-	public DecorationRepresentation(){}
+	public DecorationModel(){}
 }

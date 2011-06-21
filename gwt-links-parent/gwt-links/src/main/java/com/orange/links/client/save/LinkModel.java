@@ -3,11 +3,11 @@ package com.orange.links.client.save;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 
-public class LinkRepresentation implements IsSerializable {
+public class LinkModel implements IsSerializable {
 	public String startId;
 	public String endId;
-	public DecorationRepresentation decoration;
+	public DecorationModel decoration;
 	public int[][] pointList;
 	public String type;
-	public LinkRepresentation(){};
+	public LinkModel(){};
 }
