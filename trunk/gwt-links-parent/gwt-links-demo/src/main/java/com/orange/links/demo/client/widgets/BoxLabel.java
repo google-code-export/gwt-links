@@ -13,9 +13,9 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Label;
-import com.orange.links.client.save.Savable;
+import com.orange.links.client.save.IsDiagramSerializable;
 
-public class BoxLabel extends Label implements HasAllTouchHandlers,Savable{
+public class BoxLabel extends Label implements HasAllTouchHandlers,IsDiagramSerializable{
 
 	public static String identifier = "boxlabel";
 	String content;
@@ -51,7 +51,7 @@ public class BoxLabel extends Label implements HasAllTouchHandlers,Savable{
 	}
 
 	@Override
-	public String getIdentifier() {
+	public String getType() {
 		return this.identifier;
 	}
 
