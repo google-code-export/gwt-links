@@ -11,7 +11,7 @@ import com.orange.links.client.connection.Connection;
 import com.orange.links.client.connection.StraightConnection;
 import com.orange.links.client.utils.WidgetUtils;
 
-public class DiagramRepresentation implements IsSerializable{
+public class DiagramModel implements IsSerializable{
 
 	// Diagram Properties
 	private int width;
@@ -19,17 +19,17 @@ public class DiagramRepresentation implements IsSerializable{
 	private boolean hasGrid;
 
 	// Functions
-	private Set<FunctionRepresentation> functionRepresentationSet;
+	private Set<FunctionModel> functionRepresentationSet;
 	private Map<Widget,String> functionWidgetMap;
 	private int id = 0;
 
 	// Links
-	private Set<LinkRepresentation> linkRepresentationSet;
+	private Set<LinkModel> linkRepresentationSet;
 
 
-	public DiagramRepresentation(){
-		functionRepresentationSet = new HashSet<FunctionRepresentation>();
-		linkRepresentationSet = new HashSet<LinkRepresentation>();
+	public DiagramModel(){
+		functionRepresentationSet = new HashSet<FunctionModel>();
+		linkRepresentationSet = new HashSet<LinkModel>();
 		functionWidgetMap = new HashMap<Widget, String>();
 	}
 
@@ -40,13 +40,13 @@ public class DiagramRepresentation implements IsSerializable{
 	}
 
 	public void addFunction(Widget functionWidget){
-		FunctionRepresentation function = new FunctionRepresentation();
+		FunctionModel function = new FunctionModel();
 		function.id = ++id + "";
 		function.top = WidgetUtils.getTop(functionWidget);
 		function.left = WidgetUtils.getLeft(functionWidget);
 		try{
-			function.content = ((Savable) functionWidget).getContentRepresentation();
-			function.identifier = ((Savable) functionWidget).getIdentifier();
+			function.content = ((IsDiagramSerializable) functionWidget).getContentRepresentation();
+			function.identifier = ((IsDiagramSerializable) functionWidget).getType();
 		}
 		catch(ClassCastException e){
 			throw new IllegalArgumentException("Widgets must implement the interface Savable to be saved");
@@ -55,23 +55,23 @@ public class DiagramRepresentation implements IsSerializable{
 		functionWidgetMap.put(functionWidget,function.id);
 	}
 	
-	public void addFunction(FunctionRepresentation functionRepresentation){
+	public void addFunction(FunctionModel functionRepresentation){
 		functionRepresentationSet.add(functionRepresentation);
 	}
 	
 	public void addLink(Widget startWidget,Widget endWidget,
 			int[][] pointList,
 			 Connection c){
-		LinkRepresentation link = new LinkRepresentation();
+		LinkModel link = new LinkModel();
 		link.pointList = pointList;
 		link.startId = functionWidgetMap.get(startWidget);
 		link.endId = functionWidgetMap.get(endWidget);
 		if(c.getDecoration() != null){
 			Widget w = c.getDecoration().getWidget();
-			DecorationRepresentation decoration = new DecorationRepresentation();
+			DecorationModel decoration = new DecorationModel();
 			try{
-				decoration.content = ((Savable) w).getContentRepresentation();
-				decoration.identifier = ((Savable) w).getIdentifier();
+				decoration.content = ((IsDiagramSerializable) w).getContentRepresentation();
+				decoration.identifier = ((IsDiagramSerializable) w).getType();
 			}
 			catch(ClassCastException e){
 				throw new IllegalArgumentException("Decoration must implement the interface Savable");
@@ -86,7 +86,7 @@ public class DiagramRepresentation implements IsSerializable{
 		linkRepresentationSet.add(link);
 	}
 	
-	public void addLink(LinkRepresentation linkRepresentation){
+	public void addLink(LinkModel linkRepresentation){
 		linkRepresentationSet.add(linkRepresentation);
 	}
 
@@ -114,11 +114,11 @@ public class DiagramRepresentation implements IsSerializable{
 		this.hasGrid = hasGrid;
 	}
 
-	public Set<FunctionRepresentation> getFunctionRepresentationSet() {
+	public Set<FunctionModel> getFunctionRepresentationSet() {
 		return functionRepresentationSet;
 	}
 
-	public Set<LinkRepresentation> getLinkRepresentationSet() {
+	public Set<LinkModel> getLinkRepresentationSet() {
 		return linkRepresentationSet;
 	}
 

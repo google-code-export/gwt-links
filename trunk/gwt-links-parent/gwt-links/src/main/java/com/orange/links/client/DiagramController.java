@@ -49,11 +49,11 @@ import com.orange.links.client.event.UntieLinkEvent.HasUntieLinkHandlers;
 import com.orange.links.client.event.UntieLinkHandler;
 import com.orange.links.client.menu.ContextMenu;
 import com.orange.links.client.menu.HasContextMenu;
-import com.orange.links.client.save.DiagramRepresentation;
-import com.orange.links.client.save.DiagramSaveFactory;
-import com.orange.links.client.save.DiagramTranslationService;
-import com.orange.links.client.save.FunctionRepresentation;
-import com.orange.links.client.save.LinkRepresentation;
+import com.orange.links.client.save.DiagramModel;
+import com.orange.links.client.save.DiagramWidgetFactory;
+import com.orange.links.client.save.DiagramSerializationService;
+import com.orange.links.client.save.FunctionModel;
+import com.orange.links.client.save.LinkModel;
 import com.orange.links.client.shapes.DecorationShape;
 import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.client.shapes.FunctionShape;
@@ -752,8 +752,8 @@ public class DiagramController implements HasNewFunctionHandlers,
 	 * 
 	 * 
 	 */
-	protected DiagramRepresentation getDiagramRepresentation(){
-		DiagramRepresentation diagramRepresentation = new DiagramRepresentation();
+	protected DiagramModel getDiagramRepresentation(){
+		DiagramModel diagramRepresentation = new DiagramModel();
 		diagramRepresentation.setDiagramProperties(this.canvasWidth,
 				this.canvasHeight,this.showGrid);
 
@@ -780,22 +780,22 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 	
 	public String exportDiagram(){
-		return DiagramTranslationService.exportDiagram(getDiagramRepresentation());
+		return DiagramSerializationService.exportDiagram(getDiagramRepresentation());
 	}
 	
-	public void importDiagram(String diagramXmlExport, DiagramSaveFactory saveFactory){
-		DiagramRepresentation diagramRepresentation = DiagramTranslationService.importDiagram(diagramXmlExport);
+	public void importDiagram(String diagramXmlExport, DiagramWidgetFactory saveFactory){
+		DiagramModel diagramRepresentation = DiagramSerializationService.importDiagram(diagramXmlExport);
 		// Display the converted graphical representation
 		clearDiagram();
 		// Add Functions
 		Map<String,Widget> idToWidgetMap = new HashMap<String,Widget>();
-		for(FunctionRepresentation function : diagramRepresentation.getFunctionRepresentationSet()){
-			Widget w = saveFactory.getFunctionByIdentifier(function.identifier, function.content);
+		for(FunctionModel function : diagramRepresentation.getFunctionRepresentationSet()){
+			Widget w = saveFactory.getFunctionByType(function.identifier, function.content);
 			addWidget(w, function.left, function.top);
 			idToWidgetMap.put(function.id, w);
 		}
 		// Add links
-		for(LinkRepresentation link : diagramRepresentation.getLinkRepresentationSet()){
+		for(LinkModel link : diagramRepresentation.getLinkRepresentationSet()){
 			Widget w1 = idToWidgetMap.get(link.startId);
 			Widget w2 = idToWidgetMap.get(link.endId);
 			Connection c;
@@ -805,7 +805,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 				c = drawStraightArrowConnection(w1, w2);
 			}
 			if(link.decoration != null){
-				addDecoration(saveFactory.getDecorationByIdentifier(
+				addDecoration(saveFactory.getDecorationByType(
 						link.decoration.identifier , link.decoration.content ), c);
 			} 
 			
@@ -813,6 +813,9 @@ public class DiagramController implements HasNewFunctionHandlers,
 			for(int[] p : link.pointList){
 				c.addMovablePoint(new com.orange.links.client.shapes.Point(p[0],p[1]));
 			}
+			
+			// Fire TieEvent
+			handlerManager.fireEvent(new TieLinkEvent(w1, w2, c));
 		}
 	}
 
