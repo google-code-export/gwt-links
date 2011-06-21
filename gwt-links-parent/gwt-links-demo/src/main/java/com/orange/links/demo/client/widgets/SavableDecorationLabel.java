@@ -2,9 +2,9 @@ package com.orange.links.demo.client.widgets;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.Label;
-import com.orange.links.client.save.Savable;
+import com.orange.links.client.save.IsDiagramSerializable;
 
-public class SavableDecorationLabel extends Label implements Savable{
+public class SavableDecorationLabel extends Label implements IsDiagramSerializable{
 	
 	public static String identifier = "savabledecorationlabel";
 	public String content;
@@ -18,7 +18,7 @@ public class SavableDecorationLabel extends Label implements Savable{
 	}
 	
 	@Override
-	public String getIdentifier() {
+	public String getType() {
 		return identifier;
 	}
 

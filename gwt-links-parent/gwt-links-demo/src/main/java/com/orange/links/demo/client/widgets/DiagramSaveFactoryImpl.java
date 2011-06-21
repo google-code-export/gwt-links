@@ -1,23 +1,23 @@
 package com.orange.links.demo.client.widgets;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.orange.links.client.save.DiagramSaveFactory;
+import com.orange.links.client.save.DiagramWidgetFactory;
 
-public class DiagramSaveFactoryImpl implements DiagramSaveFactory{
+public class DiagramSaveFactoryImpl implements DiagramWidgetFactory{
 
 	@Override
-	public Widget getFunctionByIdentifier(String identifier, String content) {
-		if(identifier.equals(BoxLabel.identifier)){
+	public Widget getFunctionByType(String type, String content) {
+		if(type.equals(BoxLabel.identifier)){
 			return new BoxLabel(content);
-		} else if(identifier.equals(SavableImage.identifier)){
+		} else if(type.equals(SavableImage.identifier)){
 			return new SavableImage(content);
 		}
 		return null;
 	}
 
 	@Override
-	public Widget getDecorationByIdentifier(String identifier, String content) {
-		if(identifier.equals(SavableDecorationLabel.identifier)){
+	public Widget getDecorationByType(String type, String content) {
+		if(type.equals(SavableDecorationLabel.identifier)){
 			return new SavableDecorationLabel(content);
 		}
 		return null;

@@ -1,9 +1,9 @@
 package com.orange.links.demo.client.widgets;
 
 import com.google.gwt.user.client.ui.Image;
-import com.orange.links.client.save.Savable;
+import com.orange.links.client.save.IsDiagramSerializable;
 
-public class SavableImage extends Image implements Savable{
+public class SavableImage extends Image implements IsDiagramSerializable{
 
 	public static  String identifier = "image";
 	private String content;
@@ -14,7 +14,7 @@ public class SavableImage extends Image implements Savable{
 	}
 	
 	@Override
-	public String getIdentifier() {
+	public String getType() {
 		return this.identifier;
 	}
 
