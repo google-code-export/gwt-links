@@ -752,7 +752,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	 * 
 	 * 
 	 */
-	protected DiagramModel getDiagramRepresentation(){
+	public DiagramModel getDiagramModel(){
 		DiagramModel diagramRepresentation = new DiagramModel();
 		diagramRepresentation.setDiagramProperties(this.canvasWidth,
 				this.canvasHeight,this.showGrid);
@@ -780,7 +780,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 	
 	public String exportDiagram(){
-		return DiagramSerializationService.exportDiagram(getDiagramRepresentation());
+		return DiagramSerializationService.exportDiagram(getDiagramModel());
 	}
 	
 	public void importDiagram(String diagramXmlExport, DiagramWidgetFactory saveFactory){

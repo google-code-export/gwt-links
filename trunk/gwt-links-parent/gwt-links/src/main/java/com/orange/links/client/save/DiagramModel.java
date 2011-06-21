@@ -55,6 +55,34 @@ public class DiagramModel implements IsSerializable{
 		functionWidgetMap.put(functionWidget,function.id);
 	}
 	
+	public Widget getFunctionById(String id){
+		for(Widget w : functionWidgetMap.keySet()){
+			if(functionWidgetMap.get(w).equals(id))
+				return w;
+		}
+		return null;
+	}
+	
+	public int getNumberOfStartingLinks(Widget widget){
+		String id = functionWidgetMap.get(widget);
+		int numberOfStartingLinks = 0;
+		for(LinkModel link : linkRepresentationSet){
+			if(link.startId.equals(id))
+				numberOfStartingLinks++;
+		}
+		return numberOfStartingLinks;
+	}
+	
+	public int getNumberOfIncomingLinks(Widget widget){
+		String id = functionWidgetMap.get(widget);
+		int numberOfIncomingLinks = 0;
+		for(LinkModel link : linkRepresentationSet){
+			if(link.endId.equals(id))
+				numberOfIncomingLinks++;
+		}
+		return numberOfIncomingLinks;
+	}
+	
 	public void addFunction(FunctionModel functionRepresentation){
 		functionRepresentationSet.add(functionRepresentation);
 	}
