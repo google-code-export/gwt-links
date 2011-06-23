@@ -5,14 +5,15 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
-import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
-import com.orange.links.demo.client.widgets.*;
+import com.orange.links.demo.client.widgets.BoxLabel;
+import com.orange.links.demo.client.widgets.LabelWithMenu;
 
 public class Example1 extends AbstractExample{
-
+	
 	@Override
-	public void draw(DiagramController controller) {
+	public void draw() {
+		
 		// Create the elements
 		Widget labelHello = new BoxLabel("Hello");
 		controller.addWidget(labelHello,25,115);
@@ -50,6 +51,11 @@ public class Example1 extends AbstractExample{
 	@Override
 	public String getSourceLink() {
 		return "http://code.google.com/p/gwt-links/source/browse/trunk/gwt-links-parent/gwt-links-demo/src/main/java/com/orange/links/demo/client/example/Example1.java";
+	}
+
+	@Override
+	public Widget asWidget() {
+		return controller.getView();
 	}
 
 }
