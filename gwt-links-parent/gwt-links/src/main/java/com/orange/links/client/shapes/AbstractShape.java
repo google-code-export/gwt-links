@@ -1,5 +1,6 @@
 package com.orange.links.client.shapes;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,10 +46,15 @@ public abstract class AbstractShape implements Shape {
 
     protected int getContainerOffsetLeft() {
         if (containerOffsetLeft < 0 || !sync) {
+        	int scrollLeft = 0;
             Element parent = DOM.getParent(widget.getElement());
             while (parent != null) {
+            	if(getScrollLeft(parent) > 0){
+            		scrollLeft += getScrollLeft(parent);
+            		GWT.log("Scroll left detected : " + scrollLeft);
+            	}
                 if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
-                    containerOffsetLeft = DOM.getAbsoluteLeft(parent);
+                    containerOffsetLeft = DOM.getAbsoluteLeft(parent) - scrollLeft;
                 }
                 parent = DOM.getParent(parent);
             }
@@ -56,22 +62,37 @@ public abstract class AbstractShape implements Shape {
         return containerOffsetLeft;
     }
 
+   
     public int getTop() {
         return widget.getAbsoluteTop() - getContainerOffsetTop();
     }
 
     protected int getContainerOffsetTop() {
         if (containerOffsetTop < 0 || !sync) {
+        	int scrollTop = 0;
             Element parent = DOM.getParent(widget.getElement());
             while (parent != null) {
+            	if(getScrollTop(parent) > 0){
+            		scrollTop += getScrollTop(parent);
+            		GWT.log("Scroll Top detected : " + scrollTop);
+            	}
                 if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
-                    containerOffsetTop = DOM.getAbsoluteTop(parent);
+                    containerOffsetTop = DOM.getAbsoluteTop(parent) - scrollTop;
                 }
                 parent = DOM.getParent(parent);
             }
         }
         return containerOffsetTop;
     }
+    
+    private native int getScrollLeft(Element element)/*-{
+		return element.scrollLeft;
+	}-*/;
+
+    private native int getScrollTop(Element element)/*-{
+		return element.scrollTop;
+	}-*/;
+
 
     public int getWidth() {
         if (offsetWidth < 0 || !sync) {

@@ -20,6 +20,8 @@ import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -29,6 +31,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
@@ -50,8 +53,8 @@ import com.orange.links.client.event.UntieLinkHandler;
 import com.orange.links.client.menu.ContextMenu;
 import com.orange.links.client.menu.HasContextMenu;
 import com.orange.links.client.save.DiagramModel;
-import com.orange.links.client.save.DiagramWidgetFactory;
 import com.orange.links.client.save.DiagramSerializationService;
+import com.orange.links.client.save.DiagramWidgetFactory;
 import com.orange.links.client.save.FunctionModel;
 import com.orange.links.client.save.LinkModel;
 import com.orange.links.client.shapes.DecorationShape;
@@ -89,6 +92,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	private DragController dragController;
 	private BackgroundCanvas backgroundCanvas;
 	private AbsolutePanel widgetPanel;
+	private ScrollPanel scrollPanel;
 	private HandlerManager handlerManager;
 	private boolean showGrid;
 
@@ -155,6 +159,13 @@ public class DiagramController implements HasNewFunctionHandlers,
 		ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
 		ContextMenu.disableBrowserContextMenu(topCanvas.asWidget().getElement());
 	}
+	
+	public DiagramController(int canvasWidth, int canvasHeight, int frameWidth, int frameHeight){
+		this(canvasWidth, canvasHeight);
+		scrollPanel = new ScrollPanel(getView());
+		scrollPanel.setWidth(frameWidth + "px");
+		scrollPanel.setHeight(frameHeight + "px");
+	}
 
 	protected void initMouseHandlers(final DiagramCanvas canvas) {
 		canvas.addDomHandler(new MouseMoveHandler() {
@@ -220,7 +231,9 @@ public class DiagramController implements HasNewFunctionHandlers,
 		startFunctionWidget = null;
 		buildConnection = null;
 
-		// Restart widgetPanel
+		// Restart widgetPane
+		if(scrollPanel != null)
+			scrollPanel.clear();
 		widgetPanel.clear();
 		widgetPanel.add(topCanvas.asWidget());
 		topCanvas.getElement().getStyle().setPosition(Position.ABSOLUTE);
@@ -407,6 +420,24 @@ public class DiagramController implements HasNewFunctionHandlers,
 	public AbsolutePanel getView() {
 		return widgetPanel;
 	}
+	
+	public void setFrameSize(int width, int height){
+		if(scrollPanel == null){
+			scrollPanel = new ScrollPanel(widgetPanel);
+		}
+		scrollPanel.setWidth(width + "px");
+		scrollPanel.setHeight(height + "px");
+	}
+	
+	public ScrollPanel getViewAsScrollPanel(){
+		scrollPanel.addScrollHandler(new ScrollHandler() {
+			@Override
+			public void onScroll(ScrollEvent event) {
+				unsynchronizedShapes();
+			}
+		});
+		return scrollPanel;
+	}
 
 	/**
 	 * Register a drag controller to control the refresh rate
@@ -453,6 +484,20 @@ public class DiagramController implements HasNewFunctionHandlers,
 				}
 			}
 		});
+	}
+	
+	public void unsynchronizedShapes(){
+		for(FunctionShape shape : shapes){
+			shape.setSynchronized(false);
+			shape.getConnections().setSynchronized(false);
+		}
+	}
+	
+	public void synchronizedShapes(){
+		for(FunctionShape shape : shapes){
+			shape.setSynchronized(true);
+			shape.getConnections().setSynchronized(true);
+		}
 	}
 
 	@Override
