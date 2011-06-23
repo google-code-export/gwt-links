@@ -14,18 +14,15 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
-import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;
-import com.orange.links.client.connection.Connection;
 import com.orange.links.client.event.TieLinkEvent;
 import com.orange.links.client.event.TieLinkHandler;
 import com.orange.links.client.event.UntieLinkEvent;
 import com.orange.links.client.event.UntieLinkHandler;
-import com.orange.links.client.shapes.Drawable;
-import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.demo.client.example.AbstractExample;
 import com.orange.links.demo.client.example.Example1;
 import com.orange.links.demo.client.example.Example2;
 import com.orange.links.demo.client.example.Example3;
+import com.orange.links.demo.client.example.Example4;
 import com.orange.links.demo.client.widgets.ExampleMenuElement;
 
 public class GwtLinksTestEntryPoint implements EntryPoint {
@@ -38,7 +35,8 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	private AbstractExample[] examples = {
 			new Example1(),
 			new Example2(),
-			new Example3()
+			new Example3(),
+			new Example4()
 	};
 	
 	public void onModuleLoad() {
@@ -185,19 +183,22 @@ public class GwtLinksTestEntryPoint implements EntryPoint {
 	
 	public void loadExample(AbstractExample example){
 		int index = 0;
+		
 		if(currentController != null){
 			currentController.clearDiagram();
+			globalPanel.remove(index);
 		}
 		else{
 			// Create the drawing zone
 			currentController = new DiagramController(tabWidth,tabHeight);
 			currentController.showGrid(true);
-			Widget w = currentController.getView();
-			w.getElement().getStyle().setMargin(10, Unit.PX);
-			w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
-			globalPanel.insert(w, index);
 		}
 		
-		example.draw(currentController);
+		example.setDiagramController(currentController);
+		Widget w = example.asWidget();
+		w.getElement().getStyle().setMargin(10, Unit.PX);
+		w.getElement().getStyle().setProperty("border", "1px solid #cccccc");
+		globalPanel.insert(w, index);
+		example.draw();
 	}
 }
