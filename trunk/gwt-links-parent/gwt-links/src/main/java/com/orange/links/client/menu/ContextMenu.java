@@ -13,7 +13,7 @@ public class ContextMenu extends PopupPanel {
 
     public ContextMenu() {
         super(true);
-        setStyleName(LinksClientBundle.INSTANCE.css().connectionPopup());        
+        addStyleName(LinksClientBundle.INSTANCE.css().connectionPopup());        
         add(menu);
         disableBrowserContextMenu(getElement());
     }

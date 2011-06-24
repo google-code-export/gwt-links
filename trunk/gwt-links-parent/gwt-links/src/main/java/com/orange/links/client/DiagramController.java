@@ -299,7 +299,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	 * @param top
 	 *            top margin with the absolute panel
 	 */
-	public void addWidget(final Widget w, int left, int top) {
+	public FunctionShape addWidget(final Widget w, int left, int top) {
 		
 		w.getElement().getStyle().setZIndex(3);
 		final FunctionShape shape = new FunctionShape(this, w);
@@ -338,10 +338,11 @@ public class DiagramController implements HasNewFunctionHandlers,
 		
 		// Send event
 		handlerManager.fireEvent(new NewFunctionEvent(w));
+        return shape;
 	}
 
-	public void addWidgetAtMousePoint(final Widget w) {
-		addWidget(w, mousePoint.getLeft(), mousePoint.getTop());
+	public FunctionShape addWidgetAtMousePoint(final Widget w) {
+		return addWidget(w, mousePoint.getLeft(), mousePoint.getTop());
 	}
 
 	/**
@@ -731,6 +732,15 @@ public class DiagramController implements HasNewFunctionHandlers,
 		connections.remove(c);
 		c.delete();
 		removeDecoration(c);
+	}
+	
+	public void deleteWidget(Widget widget) {
+	    FunctionShape shape = widgetShapeMap.get(widget);
+	    shapes.remove(shape);
+	    for (Connection connection : shape.getConnections()) {
+	        deleteConnection(connection);
+	    }
+	    widgetPanel.remove(widget);
 	}
 
 	private Connection getConnectionNearMouse() {

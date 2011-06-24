@@ -24,7 +24,7 @@ public class FunctionShape extends AbstractShape {
 
     @Override
     public void setSynchronized(boolean sync) {
-        if (allowSync && sync) {
+        if (allowSync && !sync) {
             centerW = null;
             centerN = null;
             centerS = null;
@@ -62,6 +62,7 @@ public class FunctionShape extends AbstractShape {
             centerN = new Point(getLeft() + getWidth() / 2, getTop());
             centerS = new Point(getLeft() + getWidth() / 2, getTop() + getHeight() - 1);
             centerE = new Point(getLeft() + getWidth() - 1, getTop() + getHeight() / 2);
+            setSynchronized(true);
         }
 
         if (p.distance(centerW) <= selectableAreaRadius) {
