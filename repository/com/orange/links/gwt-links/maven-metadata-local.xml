@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.orange.links</groupId>
+  <artifactId>gwt-links</artifactId>
+  <versioning>
+    <versions>
+      <version>1.3-SNAPSHOT</version>
+      <version>1.2</version>
+    </versions>
+    <lastUpdated>20110621130305</lastUpdated>
+  </versioning>
+</metadata>

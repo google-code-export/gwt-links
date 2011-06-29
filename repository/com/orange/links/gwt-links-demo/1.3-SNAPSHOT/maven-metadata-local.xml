@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.orange.links</groupId>
+  <artifactId>gwt-links-demo</artifactId>
+  <version>1.3-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20110524114149</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>war</extension>
+        <value>1.3-SNAPSHOT</value>
+        <updated>20110524114149</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.3-SNAPSHOT</value>
+        <updated>20110524114149</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
