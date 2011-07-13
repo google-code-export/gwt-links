@@ -2,6 +2,7 @@ package com.orange.links.client;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.allen_sauer.gwt.dnd.client.DragController;
@@ -730,6 +731,15 @@ public class DiagramController implements HasNewFunctionHandlers,
 
 	public void deleteConnection(Connection c) {
 		connections.remove(c);
+		for (Map<Widget,Connection> entry : functionsMap.values()) {
+			for(Iterator<Connection> it = entry.values().iterator(); it.hasNext(); ){
+				Connection connection = it.next();
+				if (connection.equals(c)) {
+					it.remove();
+					break;
+				}
+			}
+		}
 		c.delete();
 		removeDecoration(c);
 	}
@@ -737,6 +747,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	public void deleteWidget(Widget widget) {
 	    FunctionShape shape = widgetShapeMap.get(widget);
 	    shapes.remove(shape);
+		functionsMap.remove(widget);
 	    for (Connection connection : shape.getConnections()) {
 	        deleteConnection(connection);
 	    }
