@@ -242,6 +242,13 @@ public class DiagramController implements HasNewFunctionHandlers,
 		topCanvas.getElement().getStyle().setPosition(Position.ABSOLUTE);
 		showGrid(showGrid);
 	}
+	
+	/**
+	 * Remove the drag controller
+	 */
+	public void removeDragController(){
+		dragController = null;
+	}
 
 	/**
 	 * Draw a straight connection with an arrow between two GWT widgets.
@@ -905,6 +912,9 @@ public class DiagramController implements HasNewFunctionHandlers,
 
 	public void setAllowingUserInteractions(boolean allowingUserInteractions) {
 		this.allowingUserInteractions = allowingUserInteractions;
+		if(!allowingUserInteractions){
+			removeDragController();
+		}
 	}
 
 
