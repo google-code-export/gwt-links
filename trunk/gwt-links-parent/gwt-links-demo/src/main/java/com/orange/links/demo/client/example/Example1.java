@@ -1,6 +1,5 @@
 package com.orange.links.demo.client.example;
 
-import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -14,6 +13,8 @@ public class Example1 extends AbstractExample{
 	@Override
 	public void draw() {
 		
+		controller.setAllowingUserInteractions(false);
+		
 		// Create the elements
 		Widget labelHello = new BoxLabel("Hello");
 		controller.addWidget(labelHello,25,115);
@@ -21,12 +22,6 @@ public class Example1 extends AbstractExample{
         LabelWithMenu hasMenu = new LabelWithMenu("Context Menu");
 		controller.addWidget(hasMenu,200,115);
 		
-		// Add DnD logic
-		PickupDragController dragController = new PickupDragController(controller.getView(), true);
-		dragController.makeDraggable(labelHello);
-        dragController.makeDraggable(hasMenu);
-        
-		controller.registerDragController(dragController);
 		
 		// Add the logic
 		Connection con = controller.drawStraightArrowConnection(labelHello, hasMenu);
@@ -45,7 +40,7 @@ public class Example1 extends AbstractExample{
 
 	@Override
 	public String getDescription() {
-		return "Simple direct 'Hello World !' Example";
+		return "Simple without User Interactions";
 	}
 
 	@Override
