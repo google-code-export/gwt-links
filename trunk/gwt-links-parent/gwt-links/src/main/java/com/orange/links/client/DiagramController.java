@@ -88,6 +88,8 @@ public class DiagramController implements HasNewFunctionHandlers,
 	 * or in the web mode
 	 */
 	public static int refreshRate = GWT.isScript() ? 25 : 50;
+	
+	private boolean allowingUserInteractions = true;
 
 	private DiagramCanvas topCanvas;
 	private DragController dragController;
@@ -644,6 +646,10 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 
 	private void onMouseMove(MouseMoveEvent event) {
+		if(!isAllowingUserInteractions()){
+			return;
+		}
+		
 		int mouseX = event.getRelativeX(topCanvas.getElement());
 		int mouseY = event.getRelativeY(topCanvas.getElement());
 		mousePoint.setLeft(mouseX);
@@ -656,7 +662,10 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 
 	private void onMouseUp(MouseUpEvent event) {
-
+		if(!isAllowingUserInteractions()){
+			return;
+		}
+		
 		// Test if Right Click
 		if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
 			event.stopPropagation();
@@ -700,6 +709,10 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 
 	private void onMouseDown(MouseDownEvent event) {
+		if(!isAllowingUserInteractions()){
+			return;
+		}
+		
 		// Test if Right Click
 		if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
 			return;
@@ -883,6 +896,15 @@ public class DiagramController implements HasNewFunctionHandlers,
 			// Fire TieEvent
 			handlerManager.fireEvent(new TieLinkEvent(w1, w2, c));
 		}
+	}
+	
+
+	public boolean isAllowingUserInteractions() {
+		return allowingUserInteractions;
+	}
+
+	public void setAllowingUserInteractions(boolean allowingUserInteractions) {
+		this.allowingUserInteractions = allowingUserInteractions;
 	}
 
 
