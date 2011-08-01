@@ -6,8 +6,7 @@
 - 1.4.1 : option to disable user interactions
 
 === Bug fixes ===
-  * Shape stays translucide on Mouse Over
-  * Left and right selectable ares doesn't appear
+  * Minor bug fixes
 
 === New in this release ===
   * Improve the refresh system performance
