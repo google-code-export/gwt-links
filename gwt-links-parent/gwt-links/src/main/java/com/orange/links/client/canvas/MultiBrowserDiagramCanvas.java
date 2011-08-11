@@ -143,4 +143,9 @@ public class MultiBrowserDiagramCanvas implements DiagramCanvas{
 		canvas.cubicCurveTo(cpx, cpy, cpx, cpy, x, y);
 	}
 
+	@Override
+    public void setGlobalAlpha(double alpha) {
+        canvas.setGlobalAlpha(alpha);
+    }
+
 }

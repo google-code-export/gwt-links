@@ -74,4 +74,5 @@ public interface DiagramCanvas {
 	void arc(double x, double y, double radius,  double startAngle, double endAngle, boolean anticlockwise);
 	void fill();
 	void bezierCurveTo(double cpx, double cpy, double x, double y);
+	void setGlobalAlpha(double alpha);
 }

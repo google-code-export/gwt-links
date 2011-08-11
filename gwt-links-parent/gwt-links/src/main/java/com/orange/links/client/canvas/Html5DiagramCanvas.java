@@ -149,4 +149,9 @@ public class Html5DiagramCanvas implements DiagramCanvas{
 		context.bezierCurveTo(cpx, cpy, cpx, cpy, x, y);
 	}
 
+	@Override
+    public void setGlobalAlpha(double alpha) {
+           context.setGlobalAlpha(alpha);
+    }
+
 }
