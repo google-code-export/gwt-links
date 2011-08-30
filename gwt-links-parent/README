@@ -1,0 +1,45 @@
+  ___ __      __ _____         _     ___  _  _  _  __ ___ 
+ / __|\ \    / /|_   _|  ___  | |   |_ _|| \| || |/ // __|
+| (_ | \ \/\/ /   | |   |___| | |__  | | | .` || ' < \__ \
+ \___|  \_/\_/    |_|         |____||___||_|\_||_|\_\|___/
+                                     
+
+
+                     
+-----------------------------------
+|   HOW TO INSTALL THE PROJECT    |
+-----------------------------------
+
+1 - Checkout the project with this command : 
+svn checkout https://gwt-links.googlecode.com/svn/trunk/gwt-links-parent gwt-links-parent
+
+2 - Go to the directory "gwt-links-parent"
+cd gwt-links-parent
+
+3 - Make sure Maven is installed by running mvn -v. If it is not, download it !
+
+4 - Launch installDnd.sh (or .bat) if you are on an UNIX platform (or Windows)
+./installDnd.sh 
+or
+installDnd.bar
+
+5 - Run the following command to install the modules on your maven repository
+mvn install
+
+6 - If the previous command failed.... grab a snicker, go on 9gag and try it later !
+    (Try to run mvn build first after a mvn clean. Turn maven into verbose mode to debug what goes wrong)
+
+    If the previous command succeeded : yes, you can go to advice #7 !
+
+7 - Open Eclipse (and install GWT Plugin for Eclipse if you haven't yet installed)
+
+8 - Import "gwt-links" and "gwt-links-demo" as a Maven Project in Eclipse
+
+9 - Right-click on gwt-links-demo > Properties. 
+	In menu "Google" > "Web Toolkit", check "Use Google Web Toolkit Project" and choose your GWT SDK
+	In menu "Google" > "Web Application", check "This application has a war directory" and set "src/main/webapp" as the war directory
+
+FINALLY : Right-click on gwt-link-demo > Run as... > Web application !
+
+			You did it \o/
+
