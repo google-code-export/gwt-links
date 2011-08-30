@@ -21,7 +21,7 @@ cd gwt-links-parent
 4 - Launch installDnd.sh (or .bat) if you are on an UNIX platform (or Windows)
 ./installDnd.sh 
 or
-installDnd.bar
+installDnd.bat
 
 5 - Run the following command to install the modules on your maven repository
 mvn install
