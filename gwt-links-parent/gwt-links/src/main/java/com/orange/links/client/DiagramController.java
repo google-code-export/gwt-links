@@ -90,24 +90,24 @@ public class DiagramController implements HasNewFunctionHandlers,
 	public static int refreshRate = GWT.isScript() ? 25 : 50;
 	
 	private boolean allowingUserInteractions = true;
+	
+	protected DiagramCanvas topCanvas;
+	protected DragController dragController;
+	protected BackgroundCanvas backgroundCanvas;
+	protected AbsolutePanel widgetPanel;
+	protected ScrollPanel scrollPanel;
+	protected HandlerManager handlerManager;
+	protected boolean showGrid;
 
-	private DiagramCanvas topCanvas;
-	private DragController dragController;
-	private BackgroundCanvas backgroundCanvas;
-	private AbsolutePanel widgetPanel;
-	private ScrollPanel scrollPanel;
-	private HandlerManager handlerManager;
-	private boolean showGrid;
+	protected ContextMenu canvasMenu;
 
-	private ContextMenu canvasMenu;
+	protected DrawableSet<Connection> connections = new DrawableSet<Connection>();
+	protected DrawableSet<FunctionShape> shapes = new DrawableSet<FunctionShape>();
+	protected Map<Widget,FunctionShape> widgetShapeMap = new HashMap<Widget, FunctionShape>();
+	protected Map<Widget,Map<Widget,Connection>> functionsMap = new HashMap<Widget, Map<Widget, Connection>>();
 
-	private DrawableSet<Connection> connections = new DrawableSet<Connection>();
-	private DrawableSet<FunctionShape> shapes = new DrawableSet<FunctionShape>();
-	private Map<Widget,FunctionShape> widgetShapeMap = new HashMap<Widget,FunctionShape>();
-	private Map<Widget,Map<Widget,Connection>> functionsMap = new HashMap<Widget, Map<Widget,Connection>>();
-
-	private Point mousePoint = new Point(0, 0);
-	private Point mouseOffsetPoint = new Point(0, 0);
+	protected Point mousePoint = new Point(0, 0);
+	protected Point mouseOffsetPoint = new Point(0, 0);
 
 	// Drag Edition status
 	public boolean inEditionDragMovablePoint = false;
@@ -116,21 +116,21 @@ public class DiagramController implements HasNewFunctionHandlers,
 	public boolean inDragMovablePoint = false;
 	public boolean inDragWidget = false;
 
-	private Point highlightPoint;
-	private Connection highlightConnection;
-	private MovablePoint movablePoint;
-	private FunctionShape highlightFunctionShape;
+	protected Point highlightPoint;
+	protected Connection highlightConnection;
+	protected MovablePoint movablePoint;
+	protected FunctionShape highlightFunctionShape;
 
-	private Widget startFunctionWidget;
-	private Connection buildConnection;
+	protected Widget startFunctionWidget;
+	protected Connection buildConnection;
 
-	long nFrame = 0;
-	long previousNFrame = 0;
-	long previousTime = 0;
-	long fps = 0;
+	protected long nFrame = 0;
+	protected long previousNFrame = 0;
+	protected long previousTime = 0;
+	protected long fps = 0;
 
-	private int canvasWidth;
-	private int canvasHeight;
+	protected int canvasWidth;
+	protected int canvasHeight;
 
 	/**
 	 * Initialize the controller diagram. Use this constructor to start your diagram. A code sample is : <br/>
@@ -266,13 +266,13 @@ public class DiagramController implements HasNewFunctionHandlers,
 		return c;
 	}
 
-	private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Widget start, Widget end) {
+	protected <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Widget start, Widget end) {
 		FunctionShape startShape = widgetShapeMap.get(start);
 		FunctionShape endShape = widgetShapeMap.get(end);
 		return drawConnection(cf, startShape, endShape);
 	}
 
-	private <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Shape start, Shape end) {
+	protected <C extends Connection> C drawConnection(ConnectionFactory<C> cf, Shape start, Shape end) {
 		// Create Connection and Store it in the controller
 		C c = cf.create(this,start, end);
 		c.setController(this);
@@ -546,7 +546,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	}
 
 	// setup timer
-	private final Timer timer = new Timer() {
+	protected final Timer timer = new Timer() {
 		@Override
 		public void run() {
 			nFrame++;
@@ -554,7 +554,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		}
 	};
 
-	private final Timer frameTimer = new Timer() {
+	protected final Timer frameTimer = new Timer() {
 		@Override
 		public void run() {
 			long now = new Date().getTime();
@@ -626,11 +626,11 @@ public class DiagramController implements HasNewFunctionHandlers,
 		connections.getUnsynchronizedDrawables().draw();
 	}
 
-	private void clearAnimationsOnCanvas() {
+	protected void clearAnimationsOnCanvas() {
 		RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 	}
 
-	private void showContextualMenu() {
+	protected void showContextualMenu() {
 		final Connection c = getConnectionNearMouse();
 		if (c != null) {
 			showMenu(c);
@@ -640,11 +640,11 @@ public class DiagramController implements HasNewFunctionHandlers,
 		showMenu(this);
 	}
 
-	private void showMenu(final HasContextMenu c) {
+	protected void showMenu(final HasContextMenu c) {
 		showMenu(c, mouseOffsetPoint.getLeft(), mouseOffsetPoint.getTop());
 	}
 
-	private void showMenu(final HasContextMenu c, int left, int top) {
+	protected void showMenu(final HasContextMenu c, int left, int top) {
 		ContextMenu menu = c.getContextMenu();
 		if (menu != null) {
 			menu.setPopupPosition(left, top);
@@ -652,7 +652,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		}
 	}
 
-	private void onMouseMove(MouseMoveEvent event) {
+	protected void onMouseMove(MouseMoveEvent event) {
 		if(!isAllowingUserInteractions()){
 			return;
 		}
@@ -668,7 +668,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		mouseOffsetPoint.setTop(offsetMouseY);
 	}
 
-	private void onMouseUp(MouseUpEvent event) {
+	protected void onMouseUp(MouseUpEvent event) {
 		if(!isAllowingUserInteractions()){
 			return;
 		}
@@ -715,7 +715,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		}
 	}
 
-	private void onMouseDown(MouseDownEvent event) {
+	protected void onMouseDown(MouseDownEvent event) {
 		if(!isAllowingUserInteractions()){
 			return;
 		}
@@ -774,7 +774,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 	    widgetPanel.remove(widget);
 	}
 
-	private Connection getConnectionNearMouse() {
+	protected Connection getConnectionNearMouse() {
 		for (Connection c : connections) {
 			if (c.isMouseNearConnection(mousePoint)) {
 				return c;
@@ -783,7 +783,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		return null;
 	}
 
-	private void drawBuildArrow(Widget startFunctionWidget, Point mousePoint) {
+	protected void drawBuildArrow(Widget startFunctionWidget, Point mousePoint) {
 		topCanvas.setForeground();
 		Shape startShape = new FunctionShape(this, startFunctionWidget);
 		final MouseShape endShape = new MouseShape(mousePoint);
@@ -797,7 +797,7 @@ public class DiagramController implements HasNewFunctionHandlers,
 		return mousePoint;
 	}
 
-	private FunctionShape getShapeUnderMouse() {
+	protected FunctionShape getShapeUnderMouse() {
 		for (FunctionShape s : shapes) {
 			if (mousePoint.isInside(s)) {
 				return s;
