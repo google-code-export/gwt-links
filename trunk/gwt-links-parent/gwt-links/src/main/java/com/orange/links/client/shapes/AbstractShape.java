@@ -6,6 +6,8 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
+import com.orange.links.client.utils.ClassnameContainerFinder;
+import com.orange.links.client.utils.IContainerFinder;
 
 public abstract class AbstractShape implements Shape {
 
@@ -19,7 +21,9 @@ public abstract class AbstractShape implements Shape {
     private boolean sync;
     protected boolean allowSync = true;
 
-    private DrawableSet<Connection> connections = new DrawableSet<Connection>();
+    protected DrawableSet<Connection> connections = new DrawableSet<Connection>();
+    
+    protected IContainerFinder containerFinder = new ClassnameContainerFinder();
 
     public AbstractShape(DiagramController controller, Widget widget) {
         this.widget = widget;
@@ -53,7 +57,7 @@ public abstract class AbstractShape implements Shape {
             		scrollLeft += getScrollLeft(parent);
             		GWT.log("Scroll left detected : " + scrollLeft);
             	}
-                if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
+            	if (containerFinder.isContainer(parent)) {
                     containerOffsetLeft = DOM.getAbsoluteLeft(parent) - scrollLeft;
                 }
                 parent = DOM.getParent(parent);
@@ -76,7 +80,7 @@ public abstract class AbstractShape implements Shape {
             		scrollTop += getScrollTop(parent);
             		GWT.log("Scroll Top detected : " + scrollTop);
             	}
-                if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
+            	if (containerFinder.isContainer(parent)) {
                     containerOffsetTop = DOM.getAbsoluteTop(parent) - scrollTop;
                 }
                 parent = DOM.getParent(parent);
