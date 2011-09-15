@@ -6,11 +6,13 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class WidgetUtils {
 	
+    protected static IContainerFinder containerFinder = new ClassnameContainerFinder();
+    
 	public static int getLeft(Widget widget) {
 		int containerOffset = 0;
 		Element parent = DOM.getParent(widget.getElement());
 		while( parent!=null ){
-			if( "relative".equals(DOM.getStyleAttribute(parent, "position")) ){
+			if( containerFinder.isContainer(parent) ){
 				containerOffset = DOM.getAbsoluteLeft(parent);
 				break;
 			}
@@ -23,7 +25,7 @@ public class WidgetUtils {
 		int containerOffset = 0;
 		Element parent = DOM.getParent(widget.getElement());
 		while( parent!=null ){
-			if( "relative".equals(DOM.getStyleAttribute(parent, "position")) ){
+			if( containerFinder.isContainer(parent) ){
 				containerOffset = DOM.getAbsoluteTop(parent);
 				break;
 			}
